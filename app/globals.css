@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* =========================================================
-   Apple Design Tokens – refined surfaces & depth
+   Apple Design Tokens – refined surfaces & depth + tint chips
    ========================================================= */
 
 @layer base {
@@ -49,9 +49,33 @@
     --glass-bg: rgba(255, 255, 255, 0.75);
     --glass-border: rgba(0, 0, 0, 0.06);
 
-    --font-sans: ui-sans-serif, system-ui, -apple-system,
-      BlinkMacSystemFont, "SF Pro Display", "SF Pro Text",
-      "Segoe UI", Roboto, Helvetica, Arial;
+    --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
+      "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial;
+
+    /* ---------------------------------------------------------
+       Apple "tint" chips (subtle, tone-on-tone)
+       used by components/ui/badge.tsx
+       --------------------------------------------------------- */
+
+    --tint-primary: rgba(0, 122, 255, 0.12);
+    --tint-primary-fg: rgba(0, 84, 204, 1);
+    --tint-primary-ring: rgba(0, 122, 255, 0.22);
+
+    --tint-info: rgba(0, 122, 255, 0.12);
+    --tint-info-fg: rgba(0, 84, 204, 1);
+    --tint-info-ring: rgba(0, 122, 255, 0.22);
+
+    --tint-success: rgba(52, 199, 89, 0.14);
+    --tint-success-fg: rgba(24, 128, 56, 1);
+    --tint-success-ring: rgba(52, 199, 89, 0.22);
+
+    --tint-warning: rgba(255, 149, 0, 0.14);
+    --tint-warning-fg: rgba(178, 98, 0, 1);
+    --tint-warning-ring: rgba(255, 149, 0, 0.22);
+
+    --tint-danger: rgba(255, 59, 48, 0.14);
+    --tint-danger-fg: rgba(180, 34, 28, 1);
+    --tint-danger-ring: rgba(255, 59, 48, 0.22);
   }
 
   .dark {
@@ -70,6 +94,27 @@
 
     --glass-bg: rgba(20, 20, 22, 0.6);
     --glass-border: rgba(255, 255, 255, 0.08);
+
+    /* Dark tint chips (slightly stronger for contrast) */
+    --tint-primary: rgba(10, 132, 255, 0.22);
+    --tint-primary-fg: rgba(180, 214, 255, 1);
+    --tint-primary-ring: rgba(10, 132, 255, 0.28);
+
+    --tint-info: rgba(10, 132, 255, 0.22);
+    --tint-info-fg: rgba(180, 214, 255, 1);
+    --tint-info-ring: rgba(10, 132, 255, 0.28);
+
+    --tint-success: rgba(48, 209, 88, 0.22);
+    --tint-success-fg: rgba(186, 240, 200, 1);
+    --tint-success-ring: rgba(48, 209, 88, 0.28);
+
+    --tint-warning: rgba(255, 159, 10, 0.22);
+    --tint-warning-fg: rgba(255, 224, 180, 1);
+    --tint-warning-ring: rgba(255, 159, 10, 0.28);
+
+    --tint-danger: rgba(255, 69, 58, 0.22);
+    --tint-danger-fg: rgba(255, 200, 195, 1);
+    --tint-danger-ring: rgba(255, 69, 58, 0.28);
   }
 
   body {
@@ -126,6 +171,7 @@
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
   }
 
   .surface {
