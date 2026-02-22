@@ -23,16 +23,14 @@ export function Sidebar() {
       {/* Logo */}
       <div className="p-4 border-b border-border">
         <Link href="/dashboard" className="flex items-center gap-3">
-          <div className="relative w-8 h-8 rounded-full bg-black flex items-center justify-center">
-            <Image
-              src="/ruehl-logo.svg"
-              alt="Rühl Automotive"
-              width={20}
-              height={20}
-              priority
-              className="filter-none invert-0"
-            />
-          </div>
+          <Image
+            src="/ruehl-logo.svg"
+            alt="Rühl Automotive"
+            width={50}
+            height={50}
+            priority
+            className="filter-none invert-0"
+          />
           <span className="font-semibold text-sm">Rühl Automotive</span>
         </Link>
       </div>
