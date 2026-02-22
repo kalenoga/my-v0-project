@@ -6,29 +6,13 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import {
-  LayoutDashboard,
-  Plus,
-  Search,
-  RotateCcw,
-  Pencil,
-  Trash2,
-  Eye,
-} from "lucide-react"
+import { LayoutDashboard, Plus, Search, RotateCcw, Pencil, Trash2, Eye } from "lucide-react"
 import Link from "next/link"
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 
 /**
  * ✅ Apple-like Ampel Chips (guaranteed visible)
  * Rot -> Neu, Orange -> In Bearbeitung, Grün -> Fertig
- * (No external dependency on Badge component)
  */
 function StatusChip({ status }: { status: Order["status"] }) {
   if (status === "Fertig") {
@@ -88,13 +72,11 @@ function AuftraegeContent() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-muted-foreground">Start</p>
           <h1 className="text-3xl font-bold">Aufträge</h1>
-          <p className="text-muted-foreground mt-1">
-            Alle PKW-Produktionsaufträge verwalten.
-          </p>
+          <p className="text-muted-foreground mt-1">Alle PKW-Produktionsaufträge verwalten.</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -113,25 +95,24 @@ function AuftraegeContent() {
       </div>
 
       {/* Search & Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
+      <Card className="apple-card">
+        <CardContent className="p-5">
+          <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <label className="text-sm font-medium mb-2 block">Suche</label>
               <Input
                 placeholder="Leitzahl, Fahrzeug, Modell oder FIN..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="bg-background"
               />
             </div>
 
-            <div className="w-48">
+            <div className="w-full sm:w-64 lg:w-56">
               <label className="text-sm font-medium mb-2 block">Status</label>
               <select
                 value={statusFilter}
                 onChange={(e) => setStatusFilter(e.target.value)}
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                className="select-apple"
               >
                 <option value="all">Alle</option>
                 <option value="Neu">Neu</option>
@@ -161,81 +142,77 @@ function AuftraegeContent() {
         </CardContent>
       </Card>
 
-      {/* Orders Table (Apple Table UI) */}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>LEITZAHL</TableHead>
-            <TableHead>FAHRZEUG</TableHead>
-            <TableHead>MODELL</TableHead>
-            <TableHead>FIN</TableHead>
-            <TableHead>STATUS</TableHead>
-            <TableHead>EINGANG</TableHead>
-            <TableHead>FERTIG BIS</TableHead>
-            <TableHead className="text-right">AKTION</TableHead>
-          </TableRow>
-        </TableHeader>
-
-        <TableBody>
-          {filteredOrders.map((order) => (
-            <TableRow key={order.id}>
-              <TableCell className="font-mono font-medium">{order.leitzahl}</TableCell>
-              <TableCell>{order.fahrzeug}</TableCell>
-              <TableCell>{order.modell}</TableCell>
-              <TableCell className="font-mono text-sm">{order.fin}</TableCell>
-
-              {/* ✅ Ampel Chip visible */}
-              <TableCell>
-                <StatusChip status={order.status} />
-              </TableCell>
-
-              <TableCell className="text-sm">{order.eingang}</TableCell>
-              <TableCell className="text-sm">{order.fertigBis}</TableCell>
-
-              <TableCell>
-                <div className="flex items-center justify-end gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => router.push(`/dashboard/auftraege/${order.id}`)}
-                  >
-                    <Pencil className="w-4 h-4 mr-1" />
-                    Bearbeiten
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() =>
-                      router.push(`/dashboard/auftraege/${order.id}?preview=true`)
-                    }
-                  >
-                    <Eye className="w-4 h-4 mr-1" />
-                    Vorschau
-                  </Button>
-
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    className="text-red-600 hover:text-red-700 hover:bg-red-500/10"
-                    onClick={() => handleDelete(order.id)}
-                  >
-                    <Trash2 className="w-4 h-4 mr-1" />
-                    Löschen
-                  </Button>
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
-
-          {filteredOrders.length === 0 && (
+      {/* Orders Table (Mobile scroll fix) */}
+      <div className="-mx-4 sm:mx-0">
+        <Table className="min-w-[980px]">
+          <TableHeader>
             <TableRow>
-              <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
-                Keine Aufträge gefunden.
-              </TableCell>
+              <TableHead>LEITZAHL</TableHead>
+              <TableHead>FAHRZEUG</TableHead>
+              <TableHead>MODELL</TableHead>
+              <TableHead>FIN</TableHead>
+              <TableHead>STATUS</TableHead>
+              <TableHead>EINGANG</TableHead>
+              <TableHead>FERTIG BIS</TableHead>
+              <TableHead className="text-right">AKTION</TableHead>
             </TableRow>
-          )}
-        </TableBody>
-      </Table>
+          </TableHeader>
+
+          <TableBody>
+            {filteredOrders.map((order) => (
+              <TableRow key={order.id}>
+                <TableCell className="font-mono font-medium">{order.leitzahl}</TableCell>
+                <TableCell>{order.fahrzeug}</TableCell>
+                <TableCell>{order.modell}</TableCell>
+                <TableCell className="font-mono text-sm">{order.fin}</TableCell>
+
+                <TableCell>
+                  <StatusChip status={order.status} />
+                </TableCell>
+
+                <TableCell className="text-sm">{order.eingang}</TableCell>
+                <TableCell className="text-sm">{order.fertigBis}</TableCell>
+
+                <TableCell>
+                  <div className="flex items-center justify-end gap-2">
+                    <Button size="sm" onClick={() => router.push(`/dashboard/auftraege/${order.id}`)}>
+                      <Pencil className="w-4 h-4 mr-1" />
+                      Bearbeiten
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      onClick={() => router.push(`/dashboard/auftraege/${order.id}?preview=true`)}
+                    >
+                      <Eye className="w-4 h-4 mr-1" />
+                      Vorschau
+                    </Button>
+
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className="text-red-600 hover:text-red-700 hover:bg-red-500/10"
+                      onClick={() => handleDelete(order.id)}
+                    >
+                      <Trash2 className="w-4 h-4 mr-1" />
+                      Löschen
+                    </Button>
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+
+            {filteredOrders.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
+                  Keine Aufträge gefunden.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
     </div>
   )
 }
