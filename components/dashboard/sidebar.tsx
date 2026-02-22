@@ -3,7 +3,13 @@
 import Link from "next/link"
 import { usePathname } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
-import { LayoutDashboard, FileText, Users, Lock, LogOut } from "lucide-react"
+import {
+  LayoutDashboard,
+  FileText,
+  Users,
+  Lock,
+  LogOut,
+} from "lucide-react"
 import { cn } from "@/lib/utils"
 import Image from "next/image"
 
@@ -19,39 +25,40 @@ export function Sidebar() {
   const { logout } = useAuth()
 
   return (
-    <aside className="w-56 bg-card border-r border-border flex flex-col h-screen sticky top-0">
+    <aside className="w-60 bg-surface border-r border-border flex flex-col h-screen sticky top-0">
       
       {/* Branding Section */}
-      <div className="py-8 border-b border-border flex justify-center">
+      <div className="py-10 border-b border-border flex justify-center">
         <Link href="/dashboard" className="group">
           <Image
             src="/ruehl-logo.svg"
             alt="Rühl Automotive"
-            width={130}
-            height={130}
+            width={120}
+            height={120}
             priority
-            className="filter-none invert-0 transition-transform duration-300 group-hover:scale-105"
+            className="transition-transform duration-300 group-hover:scale-[1.03]"
           />
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 p-4 space-y-1">
+      <nav className="flex-1 px-4 py-6 space-y-1">
         {navItems.map((item) => {
           const isActive = pathname === item.href
+          const Icon = item.icon
 
           return (
             <Link
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm transition-all",
+                "flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "bg-amber-50 text-amber-800 font-medium"
-                  : "text-muted-foreground hover:bg-muted hover:text-foreground"
+                  ? "bg-primary/10 text-primary"
+                  : "text-muted-foreground hover:bg-accent hover:text-foreground"
               )}
             >
-              <item.icon className="w-5 h-5" />
+              <Icon className="w-5 h-5" />
               {item.label}
             </Link>
           )
@@ -62,7 +69,7 @@ export function Sidebar() {
       <div className="p-4 border-t border-border">
         <button
           onClick={logout}
-          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm text-muted-foreground hover:bg-muted hover:text-foreground transition-colors"
+          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-muted-foreground hover:bg-accent hover:text-foreground transition-all duration-200"
         >
           <LogOut className="w-5 h-5" />
           Logout
