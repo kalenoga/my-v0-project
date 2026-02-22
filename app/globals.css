@@ -1,7 +1,7 @@
 @import "tailwindcss";
 
 /* =========================================================
-   Apple Design Tokens – refined surfaces & depth + tint chips
+   Apple Design Tokens – refined surfaces & depth + utilities
    ========================================================= */
 
 @layer base {
@@ -51,32 +51,6 @@
 
     --font-sans: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
       "SF Pro Display", "SF Pro Text", "Segoe UI", Roboto, Helvetica, Arial;
-
-    /* ---------------------------------------------------------
-       Apple "tint" chips (subtle, tone-on-tone)
-       used by components/ui/badge.tsx
-       --------------------------------------------------------- */
-
-    --tint-primary: rgba(0, 122, 255, 0.12);
-    --tint-primary-fg: rgba(0, 84, 204, 1);
-    --tint-primary-ring: rgba(0, 122, 255, 0.22);
-
-    --tint-info: rgba(0, 122, 255, 0.12);
-    --tint-info-fg: rgba(0, 84, 204, 1);
-    --tint-info-ring: rgba(0, 122, 255, 0.22);
-
-    /* ✅ Ampel kräftiger (besser sichtbar) */
-    --tint-success: rgba(52, 199, 89, 0.18);
-    --tint-success-fg: rgba(16, 120, 52, 1);
-    --tint-success-ring: rgba(52, 199, 89, 0.30);
-
-    --tint-warning: rgba(255, 149, 0, 0.18);
-    --tint-warning-fg: rgba(170, 92, 0, 1);
-    --tint-warning-ring: rgba(255, 149, 0, 0.30);
-
-    --tint-danger: rgba(255, 59, 48, 0.18);
-    --tint-danger-fg: rgba(170, 30, 24, 1);
-    --tint-danger-ring: rgba(255, 59, 48, 0.30);
   }
 
   .dark {
@@ -95,27 +69,6 @@
 
     --glass-bg: rgba(20, 20, 22, 0.6);
     --glass-border: rgba(255, 255, 255, 0.08);
-
-    /* Dark tint chips (slightly stronger for contrast) */
-    --tint-primary: rgba(10, 132, 255, 0.22);
-    --tint-primary-fg: rgba(180, 214, 255, 1);
-    --tint-primary-ring: rgba(10, 132, 255, 0.28);
-
-    --tint-info: rgba(10, 132, 255, 0.22);
-    --tint-info-fg: rgba(180, 214, 255, 1);
-    --tint-info-ring: rgba(10, 132, 255, 0.28);
-
-    --tint-success: rgba(48, 209, 88, 0.24);
-    --tint-success-fg: rgba(186, 240, 200, 1);
-    --tint-success-ring: rgba(48, 209, 88, 0.32);
-
-    --tint-warning: rgba(255, 159, 10, 0.24);
-    --tint-warning-fg: rgba(255, 224, 180, 1);
-    --tint-warning-ring: rgba(255, 159, 10, 0.32);
-
-    --tint-danger: rgba(255, 69, 58, 0.24);
-    --tint-danger-fg: rgba(255, 200, 195, 1);
-    --tint-danger-ring: rgba(255, 69, 58, 0.32);
   }
 
   body {
@@ -175,8 +128,14 @@
     -webkit-backdrop-filter: blur(20px);
   }
 
-  .surface {
-    @apply bg-surface border border-border shadow-md;
-    border-radius: var(--radius-card);
+  /* Page rhythm helper: use on page containers if needed */
+  .page {
+    @apply space-y-6;
+  }
+
+  /* Apple select base */
+  .select-apple {
+    @apply w-full h-11 rounded-xl border border-border bg-surface px-4 text-sm shadow-sm transition-all duration-200;
+    @apply focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/30 focus-visible:border-ring/40;
   }
 }
