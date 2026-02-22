@@ -16,7 +16,43 @@ import {
   Eye,
 } from "lucide-react"
 import Link from "next/link"
-import { Badge } from "@/components/ui/badge"
+
+/**
+ * ✅ Apple-like Ampel Chips (guaranteed visible)
+ * Rot -> Neu, Orange -> In Bearbeitung, Grün -> Fertig
+ * (No external dependency on Badge component)
+ */
+function StatusChip({ status }: { status: Order["status"] }) {
+  if (status === "Fertig") {
+    return (
+      <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset bg-[rgba(52,199,89,0.18)] text-[rgba(16,120,52,1)] ring-[rgba(52,199,89,0.30)]">
+        Fertig
+      </span>
+    )
+  }
+
+  if (status === "Neu") {
+    return (
+      <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset bg-[rgba(255,59,48,0.18)] text-[rgba(170,30,24,1)] ring-[rgba(255,59,48,0.30)]">
+        Neu
+      </span>
+    )
+  }
+
+  if (status === "In Bearbeitung") {
+    return (
+      <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset bg-[rgba(255,149,0,0.18)] text-[rgba(170,92,0,1)] ring-[rgba(255,149,0,0.30)]">
+        In Bearbeitung
+      </span>
+    )
+  }
+
+  return (
+    <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset bg-muted text-foreground/70 ring-border/60">
+      {status}
+    </span>
+  )
+}
 
 function AuftraegeContent() {
   const { orders, deleteOrder } = useOrders()
@@ -30,24 +66,10 @@ function AuftraegeContent() {
       order.fahrzeug.toLowerCase().includes(search.toLowerCase()) ||
       order.modell.toLowerCase().includes(search.toLowerCase()) ||
       order.fin.toLowerCase().includes(search.toLowerCase())
+
     const matchesStatus = statusFilter === "all" || order.status === statusFilter
     return matchesSearch && matchesStatus
   })
-
-  // ✅ Ampel-System (Apple-elegant):
-  // Rot = Neu, Orange = In Bearbeitung, Grün = Fertig
-  const getStatusBadge = (status: Order["status"]) => {
-    switch (status) {
-      case "Fertig":
-        return <Badge variant="success">Fertig</Badge>
-      case "Neu":
-        return <Badge variant="danger">Neu</Badge>
-      case "In Bearbeitung":
-        return <Badge variant="warning">In Bearbeitung</Badge>
-      default:
-        return <Badge variant="neutral">{status}</Badge>
-    }
-  }
 
   const handleDelete = (id: string) => {
     if (confirm("Möchtest du diesen Auftrag wirklich löschen?")) {
@@ -66,6 +88,7 @@ function AuftraegeContent() {
             Alle PKW-Produktionsaufträge verwalten.
           </p>
         </div>
+
         <div className="flex items-center gap-2">
           <Button onClick={() => router.push("/dashboard/auftraege/neu")}>
             <Plus className="w-4 h-4 mr-2" />
@@ -174,9 +197,15 @@ function AuftraegeContent() {
                     <td className="p-4">{order.fahrzeug}</td>
                     <td className="p-4">{order.modell}</td>
                     <td className="p-4 font-mono text-sm">{order.fin}</td>
-                    <td className="p-4">{getStatusBadge(order.status)}</td>
+
+                    {/* ✅ Ampel Chip visible */}
+                    <td className="p-4">
+                      <StatusChip status={order.status} />
+                    </td>
+
                     <td className="p-4 text-sm">{order.eingang}</td>
                     <td className="p-4 text-sm">{order.fertigBis}</td>
+
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
                         <Button
