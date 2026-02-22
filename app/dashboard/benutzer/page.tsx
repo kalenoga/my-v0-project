@@ -27,14 +27,7 @@ import {
   UserCheck,
 } from "lucide-react"
 import Link from "next/link"
-import {
-  Table,
-  TableHeader,
-  TableBody,
-  TableHead,
-  TableRow,
-  TableCell,
-} from "@/components/ui/table"
+import { Table, TableHeader, TableBody, TableHead, TableRow, TableCell } from "@/components/ui/table"
 
 /**
  * ✅ Apple-like Chips (guaranteed visible)
@@ -143,13 +136,11 @@ function BenutzerContent() {
   return (
     <div className="space-y-6">
       {/* Page Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <div>
           <p className="text-sm text-muted-foreground">Start</p>
           <h1 className="text-3xl font-bold">Benutzerverwaltung</h1>
-          <p className="text-muted-foreground mt-1">
-            Benutzer anlegen, bearbeiten, aktivieren/deaktivieren.
-          </p>
+          <p className="text-muted-foreground mt-1">Benutzer anlegen, bearbeiten, aktivieren/deaktivieren.</p>
         </div>
 
         <div className="flex items-center gap-2">
@@ -168,16 +159,15 @@ function BenutzerContent() {
       </div>
 
       {/* Search */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-col md:flex-row gap-4">
+      <Card className="apple-card">
+        <CardContent className="p-5">
+          <div className="flex flex-col lg:flex-row gap-4">
             <div className="flex-1">
               <label className="text-sm font-medium mb-2 block">Suche</label>
               <Input
                 placeholder="Name, E-Mail oder Rolle..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
-                className="bg-background"
               />
             </div>
 
@@ -196,97 +186,99 @@ function BenutzerContent() {
         </CardContent>
       </Card>
 
-      {/* Users Table (Apple Table UI) */}
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead>ID</TableHead>
-            <TableHead>NAME</TableHead>
-            <TableHead>E-MAIL</TableHead>
-            <TableHead>ROLLE</TableHead>
-            <TableHead>STATUS</TableHead>
-            <TableHead>ERSTELLT</TableHead>
-            <TableHead className="text-right">AKTION</TableHead>
-          </TableRow>
-        </TableHeader>
+      {/* Users Table (Mobile scroll fix) */}
+      <div className="-mx-4 sm:mx-0">
+        <Table className="min-w-[860px]">
+          <TableHeader>
+            <TableRow>
+              <TableHead>ID</TableHead>
+              <TableHead>NAME</TableHead>
+              <TableHead>E-MAIL</TableHead>
+              <TableHead>ROLLE</TableHead>
+              <TableHead>STATUS</TableHead>
+              <TableHead>ERSTELLT</TableHead>
+              <TableHead className="text-right">AKTION</TableHead>
+            </TableRow>
+          </TableHeader>
 
-        <TableBody>
-          {filteredUsers.map((u) => (
-            <TableRow key={u.id}>
-              <TableCell>{u.id}</TableCell>
-              <TableCell className="font-medium">{u.name}</TableCell>
-              <TableCell className="text-sm">{u.email}</TableCell>
-              <TableCell>
-                <RoleChip role={u.role} />
-              </TableCell>
-              <TableCell>
-                <StatusChip status={u.status} />
-              </TableCell>
-              <TableCell className="text-sm">{u.createdAt}</TableCell>
+          <TableBody>
+            {filteredUsers.map((u) => (
+              <TableRow key={u.id}>
+                <TableCell>{u.id}</TableCell>
+                <TableCell className="font-medium">{u.name}</TableCell>
+                <TableCell className="text-sm">{u.email}</TableCell>
+                <TableCell>
+                  <RoleChip role={u.role} />
+                </TableCell>
+                <TableCell>
+                  <StatusChip status={u.status} />
+                </TableCell>
+                <TableCell className="text-sm">{u.createdAt}</TableCell>
 
-              <TableCell>
-                <div className="flex items-center justify-end gap-2">
-                  <Button
-                    size="sm"
-                    onClick={() => {
-                      setSelectedUser(u)
-                      setShowEditDialog(true)
-                    }}
-                  >
-                    <Pencil className="w-4 h-4 mr-1" />
-                    Bearbeiten
-                  </Button>
+                <TableCell>
+                  <div className="flex items-center justify-end gap-2">
+                    <Button
+                      size="sm"
+                      onClick={() => {
+                        setSelectedUser(u)
+                        setShowEditDialog(true)
+                      }}
+                    >
+                      <Pencil className="w-4 h-4 mr-1" />
+                      Bearbeiten
+                    </Button>
 
-                  <Button
-                    size="sm"
-                    variant="outline"
-                    onClick={() => {
-                      setSelectedUser(u)
-                      setShowPasswordDialog(true)
-                    }}
-                  >
-                    <Key className="w-4 h-4 mr-1" />
-                    Passwort Reset
-                  </Button>
-
-                  {u.id !== currentUser?.id && (
                     <Button
                       size="sm"
                       variant="outline"
-                      className={
-                        u.status === "aktiv"
-                          ? "text-red-600 hover:text-red-700 hover:bg-red-500/10"
-                          : "text-green-600 hover:text-green-700 hover:bg-green-500/10"
-                      }
-                      onClick={() => handleToggleStatus(u)}
+                      onClick={() => {
+                        setSelectedUser(u)
+                        setShowPasswordDialog(true)
+                      }}
                     >
-                      {u.status === "aktiv" ? (
-                        <>
-                          <UserX className="w-4 h-4 mr-1" />
-                          Deaktivieren
-                        </>
-                      ) : (
-                        <>
-                          <UserCheck className="w-4 h-4 mr-1" />
-                          Aktivieren
-                        </>
-                      )}
+                      <Key className="w-4 h-4 mr-1" />
+                      Passwort Reset
                     </Button>
-                  )}
-                </div>
-              </TableCell>
-            </TableRow>
-          ))}
 
-          {filteredUsers.length === 0 && (
-            <TableRow>
-              <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
-                Keine Benutzer gefunden.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+                    {u.id !== currentUser?.id && (
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className={
+                          u.status === "aktiv"
+                            ? "text-red-600 hover:text-red-700 hover:bg-red-500/10"
+                            : "text-green-600 hover:text-green-700 hover:bg-green-500/10"
+                        }
+                        onClick={() => handleToggleStatus(u)}
+                      >
+                        {u.status === "aktiv" ? (
+                          <>
+                            <UserX className="w-4 h-4 mr-1" />
+                            Deaktivieren
+                          </>
+                        ) : (
+                          <>
+                            <UserCheck className="w-4 h-4 mr-1" />
+                            Aktivieren
+                          </>
+                        )}
+                      </Button>
+                    )}
+                  </div>
+                </TableCell>
+              </TableRow>
+            ))}
+
+            {filteredUsers.length === 0 && (
+              <TableRow>
+                <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                  Keine Benutzer gefunden.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </div>
 
       {/* New User Dialog */}
       <Dialog open={showNewUserDialog} onOpenChange={setShowNewUserDialog}>
@@ -323,10 +315,8 @@ function BenutzerContent() {
               <select
                 id="role"
                 value={newUserData.role}
-                onChange={(e) =>
-                  setNewUserData({ ...newUserData, role: e.target.value as "admin" | "user" })
-                }
-                className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value as "admin" | "user" })}
+                className="select-apple"
               >
                 <option value="user">Benutzer</option>
                 <option value="admin">Admin</option>
@@ -390,10 +380,8 @@ function BenutzerContent() {
                 <select
                   id="edit-role"
                   value={selectedUser.role}
-                  onChange={(e) =>
-                    setSelectedUser({ ...selectedUser, role: e.target.value as "admin" | "user" })
-                  }
-                  className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
+                  onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value as "admin" | "user" })}
+                  className="select-apple"
                 >
                   <option value="user">Benutzer</option>
                   <option value="admin">Admin</option>
@@ -419,7 +407,7 @@ function BenutzerContent() {
             <DialogDescription>Setze ein neues Passwort für {selectedUser?.name}.</DialogDescription>
           </DialogHeader>
 
-        <form onSubmit={handleResetPassword} className="space-y-4">
+          <form onSubmit={handleResetPassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="new-password">Neues Passwort</Label>
               <Input
