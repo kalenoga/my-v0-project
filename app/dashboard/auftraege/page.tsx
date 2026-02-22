@@ -6,8 +6,17 @@ import { useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Card, CardContent } from "@/components/ui/card"
-import { LayoutDashboard, Plus, Search, RotateCcw, Pencil, Trash2, Eye } from "lucide-react"
+import {
+  LayoutDashboard,
+  Plus,
+  Search,
+  RotateCcw,
+  Pencil,
+  Trash2,
+  Eye,
+} from "lucide-react"
 import Link from "next/link"
+import { Badge } from "@/components/ui/badge"
 
 function AuftraegeContent() {
   const { orders, deleteOrder } = useOrders()
@@ -28,15 +37,13 @@ function AuftraegeContent() {
   const getStatusBadge = (status: Order["status"]) => {
     switch (status) {
       case "Fertig":
-        return <span className="px-3 py-1 rounded-full text-xs font-medium bg-green-100 text-green-700">Fertig</span>
+        return <Badge variant="success">Fertig</Badge>
       case "Neu":
-        return <span className="px-3 py-1 rounded-full text-xs font-medium bg-blue-100 text-blue-700">Neu</span>
+        return <Badge variant="info">Neu</Badge>
       case "In Bearbeitung":
-        return (
-          <span className="px-3 py-1 rounded-full text-xs font-medium bg-orange-100 text-orange-700">
-            In Bearbeitung
-          </span>
-        )
+        return <Badge variant="warning">In Bearbeitung</Badge>
+      default:
+        return <Badge variant="neutral">{status}</Badge>
     }
   }
 
@@ -53,16 +60,16 @@ function AuftraegeContent() {
         <div>
           <p className="text-sm text-muted-foreground">Start</p>
           <h1 className="text-3xl font-bold">Aufträge</h1>
-          <p className="text-muted-foreground mt-1">Alle PKW-Produktionsaufträge verwalten.</p>
+          <p className="text-muted-foreground mt-1">
+            Alle PKW-Produktionsaufträge verwalten.
+          </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button
-            className="bg-[#1a2234] hover:bg-[#2a3244] text-white"
-            onClick={() => router.push("/dashboard/auftraege/neu")}
-          >
+          <Button onClick={() => router.push("/dashboard/auftraege/neu")}>
             <Plus className="w-4 h-4 mr-2" />
             Neuer Auftrag
           </Button>
+
           <Button variant="outline" asChild>
             <Link href="/dashboard">
               <LayoutDashboard className="w-4 h-4 mr-2" />
@@ -85,6 +92,7 @@ function AuftraegeContent() {
                 className="bg-background"
               />
             </div>
+
             <div className="w-48">
               <label className="text-sm font-medium mb-2 block">Status</label>
               <select
@@ -98,11 +106,13 @@ function AuftraegeContent() {
                 <option value="Fertig">Fertig</option>
               </select>
             </div>
+
             <div className="flex items-end gap-2">
-              <Button className="bg-[#1a2234] hover:bg-[#2a3244] text-white">
+              <Button>
                 <Search className="w-4 h-4 mr-2" />
                 Suchen
               </Button>
+
               <Button
                 variant="outline"
                 onClick={() => {
@@ -125,19 +135,39 @@ function AuftraegeContent() {
             <table className="w-full">
               <thead>
                 <tr className="border-b border-border">
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">LEITZAHL</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">FAHRZEUG</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">MODELL</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">FIN</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">STATUS</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">EINGANG</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">FERTIG BIS</th>
-                  <th className="text-right p-4 text-sm font-medium text-muted-foreground">AKTION</th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                    LEITZAHL
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                    FAHRZEUG
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                    MODELL
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                    FIN
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                    STATUS
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                    EINGANG
+                  </th>
+                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
+                    FERTIG BIS
+                  </th>
+                  <th className="text-right p-4 text-sm font-medium text-muted-foreground">
+                    AKTION
+                  </th>
                 </tr>
               </thead>
+
               <tbody>
                 {filteredOrders.map((order) => (
-                  <tr key={order.id} className="border-b border-border hover:bg-muted/50 transition-colors">
+                  <tr
+                    key={order.id}
+                    className="border-b border-border hover:bg-muted/40 transition-colors"
+                  >
                     <td className="p-4 font-mono font-medium">{order.leitzahl}</td>
                     <td className="p-4">{order.fahrzeug}</td>
                     <td className="p-4">{order.modell}</td>
@@ -149,25 +179,27 @@ function AuftraegeContent() {
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           size="sm"
-                          className="bg-[#1a2234] hover:bg-[#2a3244] text-white"
                           onClick={() => router.push(`/dashboard/auftraege/${order.id}`)}
                         >
                           <Pencil className="w-4 h-4 mr-1" />
                           Bearbeiten
                         </Button>
+
                         <Button
                           size="sm"
                           variant="outline"
-                          className="bg-transparent"
-                          onClick={() => router.push(`/dashboard/auftraege/${order.id}?preview=true`)}
+                          onClick={() =>
+                            router.push(`/dashboard/auftraege/${order.id}?preview=true`)
+                          }
                         >
                           <Eye className="w-4 h-4 mr-1" />
                           Vorschau
                         </Button>
+
                         <Button
                           size="sm"
                           variant="outline"
-                          className="text-red-500 hover:text-red-600 hover:bg-red-50 bg-transparent"
+                          className="text-red-600 hover:text-red-700 hover:bg-red-500/10"
                           onClick={() => handleDelete(order.id)}
                         >
                           <Trash2 className="w-4 h-4 mr-1" />
@@ -177,6 +209,7 @@ function AuftraegeContent() {
                     </td>
                   </tr>
                 ))}
+
                 {filteredOrders.length === 0 && (
                   <tr>
                     <td colSpan={8} className="p-8 text-center text-muted-foreground">
