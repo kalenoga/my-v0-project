@@ -1,15 +1,13 @@
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
 
 /* =========================================================
-   Apple Design Tokens (shadcn-compatible)
+   Apple Design Tokens (Tailwind v4 + shadcn-compatible)
    Single Source of Truth for colors, radius, shadow, blur
    ========================================================= */
 
 @layer base {
   :root {
-    /* --- Core color system (HSL for shadcn) --- */
+    /* --- Core color system (HSL for shadcn-style tokens) --- */
     --background: 0 0% 98%;
     --foreground: 240 10% 10%;
 
@@ -105,18 +103,73 @@
     --glass-border: rgba(255, 255, 255, 0.12);
   }
 
+  body {
+    font-family: var(--font-sans);
+  }
+}
+
+/* =========================================================
+   Tailwind v4 theme mapping
+   This makes classes like bg-background / border-border exist
+   ========================================================= */
+
+@theme {
+  --color-background: hsl(var(--background));
+  --color-foreground: hsl(var(--foreground));
+
+  --color-surface: hsl(var(--surface));
+  --color-surface-2: hsl(var(--surface-2));
+
+  --color-card: hsl(var(--card));
+  --color-card-foreground: hsl(var(--card-foreground));
+
+  --color-popover: hsl(var(--popover));
+  --color-popover-foreground: hsl(var(--popover-foreground));
+
+  --color-primary: hsl(var(--primary));
+  --color-primary-foreground: hsl(var(--primary-foreground));
+
+  --color-secondary: hsl(var(--secondary));
+  --color-secondary-foreground: hsl(var(--secondary-foreground));
+
+  --color-muted: hsl(var(--muted));
+  --color-muted-foreground: hsl(var(--muted-foreground));
+
+  --color-accent: hsl(var(--accent));
+  --color-accent-foreground: hsl(var(--accent-foreground));
+
+  --color-destructive: hsl(var(--destructive));
+  --color-destructive-foreground: hsl(var(--destructive-foreground));
+
+  --color-border: hsl(var(--border));
+  --color-input: hsl(var(--input));
+  --color-ring: hsl(var(--ring));
+
+  --radius-lg: var(--radius);
+  --radius-xl: var(--radius-card);
+  --radius-2xl: var(--radius-modal);
+
+  --shadow-sm: var(--shadow-sm);
+  --shadow-md: var(--shadow-md);
+  --shadow-lg: var(--shadow-lg);
+}
+
+/* =========================================================
+   Base styles (now utilities exist)
+   ========================================================= */
+
+@layer base {
   * {
     @apply border-border;
   }
 
   body {
     @apply bg-background text-foreground antialiased;
-    font-family: var(--font-sans);
   }
 }
 
 /* =========================================================
-   Apple Utilities (consistent surfaces + focus)
+   Apple Utilities
    ========================================================= */
 
 @layer utilities {
