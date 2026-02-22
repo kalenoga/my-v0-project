@@ -34,12 +34,14 @@ function AuftraegeContent() {
     return matchesSearch && matchesStatus
   })
 
+  // ✅ Ampel-System (Apple-elegant):
+  // Rot = Neu, Orange = In Bearbeitung, Grün = Fertig
   const getStatusBadge = (status: Order["status"]) => {
     switch (status) {
       case "Fertig":
         return <Badge variant="success">Fertig</Badge>
       case "Neu":
-        return <Badge variant="info">Neu</Badge>
+        return <Badge variant="danger">Neu</Badge>
       case "In Bearbeitung":
         return <Badge variant="warning">In Bearbeitung</Badge>
       default:
