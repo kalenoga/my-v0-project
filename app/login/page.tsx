@@ -45,8 +45,8 @@ export default function LoginPage() {
             <Image
               src="/ruehl-logo.svg"
               alt="Rühl Automotive"
-              width={120}
-              height={120}
+              width={200}
+              height={200}
               priority
               style={{
                 filter: "none",
