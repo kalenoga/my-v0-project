@@ -25,7 +25,6 @@ export function Sidebar() {
         <Link href="/dashboard" className="flex items-center gap-3">
           <Image
             src="/ruehl-logo.svg"
-            alt="Rühl Automotive"
             width={80}
             height={80}
             priority
