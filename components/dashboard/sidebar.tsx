@@ -26,8 +26,8 @@ export function Sidebar() {
           <Image
             src="/ruehl-logo.svg"
             alt="Rühl Automotive"
-            width={50}
-            height={50}
+            width={80}
+            height={80}
             priority
             className="filter-none invert-0"
           />
