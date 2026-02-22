@@ -36,39 +36,45 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-muted/30 flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md">
-        <div className="bg-card rounded-2xl shadow-lg p-8">
-          
+    <div className="min-h-screen flex items-center justify-center px-4 py-10 bg-background">
+      {/* Apple background wash */}
+      <div className="pointer-events-none fixed inset-0">
+        <div className="absolute inset-0 bg-[radial-gradient(1200px_circle_at_20%_10%,rgba(0,122,255,0.10),transparent_45%),radial-gradient(900px_circle_at_80%_20%,rgba(52,199,89,0.08),transparent_50%),radial-gradient(900px_circle_at_50%_100%,rgba(255,149,0,0.07),transparent_55%)]" />
+      </div>
+
+      <div className="relative w-full max-w-md">
+        {/* Glass card */}
+        <div className="glass rounded-3xl border border-border shadow-lg px-8 py-10">
           {/* Logo */}
           <div className="flex justify-center mb-6">
             <Image
               src="/ruehl-logo.svg"
               alt="Rühl Automotive"
-              width={200}
-              height={200}
+              width={190}
+              height={190}
               priority
               style={{
                 filter: "none",
-                WebkitFilter: "none"
+                WebkitFilter: "none",
               }}
             />
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-center mb-2">
-            Willkommen
-          </h1>
-
-          <p className="text-muted-foreground text-center mb-6">
-            Bitte melde dich mit deinen Zugangsdaten an.
-          </p>
+          <div className="text-center mb-8">
+            <h1 className="text-2xl font-semibold tracking-tight">Willkommen</h1>
+            <p className="text-muted-foreground mt-2">
+              Bitte melde dich mit deinen Zugangsdaten an.
+            </p>
+          </div>
 
           {/* Form */}
-          <form onSubmit={handleSubmit} className="space-y-4">
-
+          <form onSubmit={handleSubmit} className="space-y-5">
             <div className="space-y-2">
-              <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wide">
+              <Label
+                htmlFor="email"
+                className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+              >
                 E-Mail
               </Label>
 
@@ -81,14 +87,17 @@ export default function LoginPage() {
                   placeholder="name@beispiel.de"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 h-12 bg-muted/50 border-0"
+                  className="pl-10 h-12 bg-surface border border-border focus-visible:ring-2 focus-visible:ring-ring/30"
                   required
                 />
               </div>
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wide">
+              <Label
+                htmlFor="password"
+                className="text-[11px] font-semibold uppercase tracking-wide text-muted-foreground"
+              >
                 Passwort
               </Label>
 
@@ -101,44 +110,37 @@ export default function LoginPage() {
                   placeholder="••••••••"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 pr-10 h-12 bg-muted/50 border-0"
+                  className="pl-10 pr-10 h-12 bg-surface border border-border focus-visible:ring-2 focus-visible:ring-ring/30"
                   required
                 />
 
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors"
+                  aria-label={showPassword ? "Passwort verbergen" : "Passwort anzeigen"}
                 >
-                  {showPassword ? (
-                    <EyeOff className="h-5 w-5" />
-                  ) : (
-                    <Eye className="h-5 w-5" />
-                  )}
+                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
                 </button>
               </div>
             </div>
 
             {error && (
-              <p className="text-sm text-destructive text-center">
+              <div className="rounded-2xl border border-red-500/20 bg-red-500/10 px-4 py-3 text-sm text-red-700">
                 {error}
-              </p>
+              </div>
             )}
 
-            <div className="text-right">
+            <div className="flex items-center justify-end">
               <button
                 type="button"
-                className="text-sm text-primary hover:underline"
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
                 Passwort vergessen?
               </button>
             </div>
 
-            <Button
-              type="submit"
-              className="w-full h-12 bg-[#1a2234] hover:bg-[#2a3244] text-white"
-              disabled={isLoading}
-            >
+            <Button type="submit" className="w-full h-12 rounded-2xl" disabled={isLoading}>
               {isLoading ? "Anmelden..." : "Anmelden"}
             </Button>
           </form>
