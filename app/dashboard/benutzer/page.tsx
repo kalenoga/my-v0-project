@@ -27,6 +27,14 @@ import {
   UserCheck,
 } from "lucide-react"
 import Link from "next/link"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table"
 
 /**
  * ✅ Apple-like Chips (guaranteed visible)
@@ -188,103 +196,97 @@ function BenutzerContent() {
         </CardContent>
       </Card>
 
-      {/* Users Table */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">ID</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">NAME</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">E-MAIL</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">ROLLE</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">STATUS</th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">ERSTELLT</th>
-                  <th className="text-right p-4 text-sm font-medium text-muted-foreground">AKTION</th>
-                </tr>
-              </thead>
+      {/* Users Table (Apple Table UI) */}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>ID</TableHead>
+            <TableHead>NAME</TableHead>
+            <TableHead>E-MAIL</TableHead>
+            <TableHead>ROLLE</TableHead>
+            <TableHead>STATUS</TableHead>
+            <TableHead>ERSTELLT</TableHead>
+            <TableHead className="text-right">AKTION</TableHead>
+          </TableRow>
+        </TableHeader>
 
-              <tbody>
-                {filteredUsers.map((u) => (
-                  <tr key={u.id} className="border-b border-border hover:bg-muted/40 transition-colors">
-                    <td className="p-4">{u.id}</td>
-                    <td className="p-4 font-medium">{u.name}</td>
-                    <td className="p-4 text-sm">{u.email}</td>
-                    <td className="p-4">
-                      <RoleChip role={u.role} />
-                    </td>
-                    <td className="p-4">
-                      <StatusChip status={u.status} />
-                    </td>
-                    <td className="p-4 text-sm">{u.createdAt}</td>
+        <TableBody>
+          {filteredUsers.map((u) => (
+            <TableRow key={u.id}>
+              <TableCell>{u.id}</TableCell>
+              <TableCell className="font-medium">{u.name}</TableCell>
+              <TableCell className="text-sm">{u.email}</TableCell>
+              <TableCell>
+                <RoleChip role={u.role} />
+              </TableCell>
+              <TableCell>
+                <StatusChip status={u.status} />
+              </TableCell>
+              <TableCell className="text-sm">{u.createdAt}</TableCell>
 
-                    <td className="p-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => {
-                            setSelectedUser(u)
-                            setShowEditDialog(true)
-                          }}
-                        >
-                          <Pencil className="w-4 h-4 mr-1" />
-                          Bearbeiten
-                        </Button>
+              <TableCell>
+                <div className="flex items-center justify-end gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => {
+                      setSelectedUser(u)
+                      setShowEditDialog(true)
+                    }}
+                  >
+                    <Pencil className="w-4 h-4 mr-1" />
+                    Bearbeiten
+                  </Button>
 
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() => {
-                            setSelectedUser(u)
-                            setShowPasswordDialog(true)
-                          }}
-                        >
-                          <Key className="w-4 h-4 mr-1" />
-                          Passwort Reset
-                        </Button>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() => {
+                      setSelectedUser(u)
+                      setShowPasswordDialog(true)
+                    }}
+                  >
+                    <Key className="w-4 h-4 mr-1" />
+                    Passwort Reset
+                  </Button>
 
-                        {u.id !== currentUser?.id && (
-                          <Button
-                            size="sm"
-                            variant="outline"
-                            className={
-                              u.status === "aktiv"
-                                ? "text-red-600 hover:text-red-700 hover:bg-red-500/10"
-                                : "text-green-600 hover:text-green-700 hover:bg-green-500/10"
-                            }
-                            onClick={() => handleToggleStatus(u)}
-                          >
-                            {u.status === "aktiv" ? (
-                              <>
-                                <UserX className="w-4 h-4 mr-1" />
-                                Deaktivieren
-                              </>
-                            ) : (
-                              <>
-                                <UserCheck className="w-4 h-4 mr-1" />
-                                Aktivieren
-                              </>
-                            )}
-                          </Button>
-                        )}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                  {u.id !== currentUser?.id && (
+                    <Button
+                      size="sm"
+                      variant="outline"
+                      className={
+                        u.status === "aktiv"
+                          ? "text-red-600 hover:text-red-700 hover:bg-red-500/10"
+                          : "text-green-600 hover:text-green-700 hover:bg-green-500/10"
+                      }
+                      onClick={() => handleToggleStatus(u)}
+                    >
+                      {u.status === "aktiv" ? (
+                        <>
+                          <UserX className="w-4 h-4 mr-1" />
+                          Deaktivieren
+                        </>
+                      ) : (
+                        <>
+                          <UserCheck className="w-4 h-4 mr-1" />
+                          Aktivieren
+                        </>
+                      )}
+                    </Button>
+                  )}
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
 
-                {filteredUsers.length === 0 && (
-                  <tr>
-                    <td colSpan={7} className="p-8 text-center text-muted-foreground">
-                      Keine Benutzer gefunden.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+          {filteredUsers.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={7} className="py-10 text-center text-muted-foreground">
+                Keine Benutzer gefunden.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
 
       {/* New User Dialog */}
       <Dialog open={showNewUserDialog} onOpenChange={setShowNewUserDialog}>
@@ -321,7 +323,9 @@ function BenutzerContent() {
               <select
                 id="role"
                 value={newUserData.role}
-                onChange={(e) => setNewUserData({ ...newUserData, role: e.target.value as "admin" | "user" })}
+                onChange={(e) =>
+                  setNewUserData({ ...newUserData, role: e.target.value as "admin" | "user" })
+                }
                 className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
               >
                 <option value="user">Benutzer</option>
@@ -344,9 +348,7 @@ function BenutzerContent() {
               <Button type="button" variant="outline" onClick={() => setShowNewUserDialog(false)}>
                 Abbrechen
               </Button>
-              <Button type="submit">
-                Benutzer erstellen
-              </Button>
+              <Button type="submit">Benutzer erstellen</Button>
             </DialogFooter>
           </form>
         </DialogContent>
@@ -388,7 +390,9 @@ function BenutzerContent() {
                 <select
                   id="edit-role"
                   value={selectedUser.role}
-                  onChange={(e) => setSelectedUser({ ...selectedUser, role: e.target.value as "admin" | "user" })}
+                  onChange={(e) =>
+                    setSelectedUser({ ...selectedUser, role: e.target.value as "admin" | "user" })
+                  }
                   className="w-full h-10 rounded-md border border-input bg-background px-3 text-sm"
                 >
                   <option value="user">Benutzer</option>
@@ -415,7 +419,7 @@ function BenutzerContent() {
             <DialogDescription>Setze ein neues Passwort für {selectedUser?.name}.</DialogDescription>
           </DialogHeader>
 
-          <form onSubmit={handleResetPassword} className="space-y-4">
+        <form onSubmit={handleResetPassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="new-password">Neues Passwort</Label>
               <Input
