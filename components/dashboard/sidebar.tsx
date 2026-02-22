@@ -25,8 +25,8 @@ export function Sidebar() {
   const { logout } = useAuth()
 
   return (
-    <aside className="w-60 bg-surface border-r border-border flex flex-col h-screen sticky top-0">
-      
+<aside className="hidden lg:flex w-64 bg-card border-r border-border flex-col h-screen sticky top-0">
+  
       {/* Branding Section */}
       <div className="py-10 border-b border-border flex justify-center">
         <Link href="/dashboard" className="group">
