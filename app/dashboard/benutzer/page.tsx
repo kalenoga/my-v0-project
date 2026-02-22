@@ -16,8 +16,56 @@ import {
   DialogFooter,
   DialogDescription,
 } from "@/components/ui/dialog"
-import { LayoutDashboard, UserPlus, Search, RotateCcw, Pencil, Key, UserX, UserCheck } from "lucide-react"
+import {
+  LayoutDashboard,
+  UserPlus,
+  Search,
+  RotateCcw,
+  Pencil,
+  Key,
+  UserX,
+  UserCheck,
+} from "lucide-react"
 import Link from "next/link"
+
+/**
+ * ✅ Apple-like Chips (guaranteed visible)
+ * - admin -> blue
+ * - aktiv -> green
+ * - deaktiv -> red
+ */
+function RoleChip({ role }: { role: string }) {
+  if (role === "admin") {
+    return (
+      <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset bg-[rgba(0,122,255,0.14)] text-[rgba(0,84,204,1)] ring-[rgba(0,122,255,0.26)]">
+        admin
+      </span>
+    )
+  }
+
+  // "user" -> subtle dot like Apple
+  return (
+    <span className="inline-flex items-center gap-2 text-sm text-muted-foreground">
+      <span className="w-2 h-2 rounded-full bg-muted-foreground/40 inline-block" />
+    </span>
+  )
+}
+
+function StatusChip({ status }: { status: string }) {
+  if (status === "aktiv") {
+    return (
+      <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset bg-[rgba(52,199,89,0.18)] text-[rgba(16,120,52,1)] ring-[rgba(52,199,89,0.30)]">
+        aktiv
+      </span>
+    )
+  }
+
+  return (
+    <span className="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium ring-1 ring-inset bg-[rgba(255,59,48,0.18)] text-[rgba(170,30,24,1)] ring-[rgba(255,59,48,0.30)]">
+      deaktiv
+    </span>
+  )
+}
 
 function BenutzerContent() {
   const { users, user: currentUser, addUser, updateUser, resetPassword } = useAuth()
@@ -84,20 +132,6 @@ function BenutzerContent() {
     updateUser(user.id, { status: newStatus })
   }
 
-  const getRoleBadge = (role: string) => {
-    if (role === "admin") {
-      return <span className="px-2 py-1 rounded text-xs font-medium bg-blue-100 text-blue-700">admin</span>
-    }
-    return <span className="w-2 h-2 rounded-full bg-gray-400 inline-block" />
-  }
-
-  const getStatusBadge = (status: string) => {
-    if (status === "aktiv") {
-      return <span className="px-3 py-1 rounded text-xs font-medium bg-green-100 text-green-700">aktiv</span>
-    }
-    return <span className="px-3 py-1 rounded text-xs font-medium bg-red-100 text-red-700">deaktiv</span>
-  }
-
   return (
     <div className="space-y-6">
       {/* Page Header */}
@@ -105,13 +139,17 @@ function BenutzerContent() {
         <div>
           <p className="text-sm text-muted-foreground">Start</p>
           <h1 className="text-3xl font-bold">Benutzerverwaltung</h1>
-          <p className="text-muted-foreground mt-1">Benutzer anlegen, bearbeiten, aktivieren/deaktivieren.</p>
+          <p className="text-muted-foreground mt-1">
+            Benutzer anlegen, bearbeiten, aktivieren/deaktivieren.
+          </p>
         </div>
+
         <div className="flex items-center gap-2">
-          <Button className="bg-[#1a2234] hover:bg-[#2a3244] text-white" onClick={() => setShowNewUserDialog(true)}>
+          <Button onClick={() => setShowNewUserDialog(true)}>
             <UserPlus className="w-4 h-4 mr-2" />
             Neuer Benutzer
           </Button>
+
           <Button variant="outline" asChild>
             <Link href="/dashboard">
               <LayoutDashboard className="w-4 h-4 mr-2" />
@@ -134,11 +172,13 @@ function BenutzerContent() {
                 className="bg-background"
               />
             </div>
+
             <div className="flex items-end gap-2">
-              <Button className="bg-[#1a2234] hover:bg-[#2a3244] text-white">
+              <Button>
                 <Search className="w-4 h-4 mr-2" />
                 Suchen
               </Button>
+
               <Button variant="outline" onClick={() => setSearch("")}>
                 <RotateCcw className="w-4 h-4 mr-2" />
                 Reset
@@ -164,20 +204,25 @@ function BenutzerContent() {
                   <th className="text-right p-4 text-sm font-medium text-muted-foreground">AKTION</th>
                 </tr>
               </thead>
+
               <tbody>
                 {filteredUsers.map((u) => (
-                  <tr key={u.id} className="border-b border-border hover:bg-muted/50 transition-colors">
+                  <tr key={u.id} className="border-b border-border hover:bg-muted/40 transition-colors">
                     <td className="p-4">{u.id}</td>
                     <td className="p-4 font-medium">{u.name}</td>
                     <td className="p-4 text-sm">{u.email}</td>
-                    <td className="p-4">{getRoleBadge(u.role)}</td>
-                    <td className="p-4">{getStatusBadge(u.status)}</td>
+                    <td className="p-4">
+                      <RoleChip role={u.role} />
+                    </td>
+                    <td className="p-4">
+                      <StatusChip status={u.status} />
+                    </td>
                     <td className="p-4 text-sm">{u.createdAt}</td>
+
                     <td className="p-4">
                       <div className="flex items-center justify-end gap-2">
                         <Button
                           size="sm"
-                          className="bg-[#1a2234] hover:bg-[#2a3244] text-white"
                           onClick={() => {
                             setSelectedUser(u)
                             setShowEditDialog(true)
@@ -186,6 +231,7 @@ function BenutzerContent() {
                           <Pencil className="w-4 h-4 mr-1" />
                           Bearbeiten
                         </Button>
+
                         <Button
                           size="sm"
                           variant="outline"
@@ -197,14 +243,15 @@ function BenutzerContent() {
                           <Key className="w-4 h-4 mr-1" />
                           Passwort Reset
                         </Button>
+
                         {u.id !== currentUser?.id && (
                           <Button
                             size="sm"
                             variant="outline"
                             className={
                               u.status === "aktiv"
-                                ? "text-red-500 hover:text-red-600 hover:bg-red-50 bg-transparent"
-                                : "text-green-500 hover:text-green-600 hover:bg-green-50 bg-transparent"
+                                ? "text-red-600 hover:text-red-700 hover:bg-red-500/10"
+                                : "text-green-600 hover:text-green-700 hover:bg-green-500/10"
                             }
                             onClick={() => handleToggleStatus(u)}
                           >
@@ -225,6 +272,14 @@ function BenutzerContent() {
                     </td>
                   </tr>
                 ))}
+
+                {filteredUsers.length === 0 && (
+                  <tr>
+                    <td colSpan={7} className="p-8 text-center text-muted-foreground">
+                      Keine Benutzer gefunden.
+                    </td>
+                  </tr>
+                )}
               </tbody>
             </table>
           </div>
@@ -238,6 +293,7 @@ function BenutzerContent() {
             <DialogTitle>Neuer Benutzer</DialogTitle>
             <DialogDescription>Erstelle einen neuen Benutzer für das System.</DialogDescription>
           </DialogHeader>
+
           <form onSubmit={handleAddUser} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">Name</Label>
@@ -248,6 +304,7 @@ function BenutzerContent() {
                 required
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="email">E-Mail</Label>
               <Input
@@ -258,6 +315,7 @@ function BenutzerContent() {
                 required
               />
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="role">Rolle</Label>
               <select
@@ -270,6 +328,7 @@ function BenutzerContent() {
                 <option value="admin">Admin</option>
               </select>
             </div>
+
             <div className="space-y-2">
               <Label htmlFor="password">Passwort</Label>
               <Input
@@ -280,11 +339,12 @@ function BenutzerContent() {
                 required
               />
             </div>
+
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowNewUserDialog(false)}>
                 Abbrechen
               </Button>
-              <Button type="submit" className="bg-[#1a2234] hover:bg-[#2a3244] text-white">
+              <Button type="submit">
                 Benutzer erstellen
               </Button>
             </DialogFooter>
@@ -299,6 +359,7 @@ function BenutzerContent() {
             <DialogTitle>Benutzer bearbeiten</DialogTitle>
             <DialogDescription>Bearbeite die Daten des Benutzers.</DialogDescription>
           </DialogHeader>
+
           {selectedUser && (
             <form onSubmit={handleEditUser} className="space-y-4">
               <div className="space-y-2">
@@ -310,6 +371,7 @@ function BenutzerContent() {
                   required
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="edit-email">E-Mail</Label>
                 <Input
@@ -320,6 +382,7 @@ function BenutzerContent() {
                   required
                 />
               </div>
+
               <div className="space-y-2">
                 <Label htmlFor="edit-role">Rolle</Label>
                 <select
@@ -332,13 +395,12 @@ function BenutzerContent() {
                   <option value="admin">Admin</option>
                 </select>
               </div>
+
               <DialogFooter>
                 <Button type="button" variant="outline" onClick={() => setShowEditDialog(false)}>
                   Abbrechen
                 </Button>
-                <Button type="submit" className="bg-[#1a2234] hover:bg-[#2a3244] text-white">
-                  Speichern
-                </Button>
+                <Button type="submit">Speichern</Button>
               </DialogFooter>
             </form>
           )}
@@ -352,6 +414,7 @@ function BenutzerContent() {
             <DialogTitle>Passwort zurücksetzen</DialogTitle>
             <DialogDescription>Setze ein neues Passwort für {selectedUser?.name}.</DialogDescription>
           </DialogHeader>
+
           <form onSubmit={handleResetPassword} className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="new-password">Neues Passwort</Label>
@@ -363,13 +426,12 @@ function BenutzerContent() {
                 required
               />
             </div>
+
             <DialogFooter>
               <Button type="button" variant="outline" onClick={() => setShowPasswordDialog(false)}>
                 Abbrechen
               </Button>
-              <Button type="submit" className="bg-[#1a2234] hover:bg-[#2a3244] text-white">
-                Passwort setzen
-              </Button>
+              <Button type="submit">Passwort setzen</Button>
             </DialogFooter>
           </form>
         </DialogContent>
