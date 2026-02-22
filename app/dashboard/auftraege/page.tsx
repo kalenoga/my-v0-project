@@ -16,6 +16,14 @@ import {
   Eye,
 } from "lucide-react"
 import Link from "next/link"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableHead,
+  TableRow,
+  TableCell,
+} from "@/components/ui/table"
 
 /**
  * ✅ Apple-like Ampel Chips (guaranteed visible)
@@ -153,106 +161,81 @@ function AuftraegeContent() {
         </CardContent>
       </Card>
 
-      {/* Orders Table */}
-      <Card>
-        <CardContent className="p-0">
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead>
-                <tr className="border-b border-border">
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
-                    LEITZAHL
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
-                    FAHRZEUG
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
-                    MODELL
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
-                    FIN
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
-                    STATUS
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
-                    EINGANG
-                  </th>
-                  <th className="text-left p-4 text-sm font-medium text-muted-foreground">
-                    FERTIG BIS
-                  </th>
-                  <th className="text-right p-4 text-sm font-medium text-muted-foreground">
-                    AKTION
-                  </th>
-                </tr>
-              </thead>
+      {/* Orders Table (Apple Table UI) */}
+      <Table>
+        <TableHeader>
+          <TableRow>
+            <TableHead>LEITZAHL</TableHead>
+            <TableHead>FAHRZEUG</TableHead>
+            <TableHead>MODELL</TableHead>
+            <TableHead>FIN</TableHead>
+            <TableHead>STATUS</TableHead>
+            <TableHead>EINGANG</TableHead>
+            <TableHead>FERTIG BIS</TableHead>
+            <TableHead className="text-right">AKTION</TableHead>
+          </TableRow>
+        </TableHeader>
 
-              <tbody>
-                {filteredOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-b border-border hover:bg-muted/40 transition-colors"
+        <TableBody>
+          {filteredOrders.map((order) => (
+            <TableRow key={order.id}>
+              <TableCell className="font-mono font-medium">{order.leitzahl}</TableCell>
+              <TableCell>{order.fahrzeug}</TableCell>
+              <TableCell>{order.modell}</TableCell>
+              <TableCell className="font-mono text-sm">{order.fin}</TableCell>
+
+              {/* ✅ Ampel Chip visible */}
+              <TableCell>
+                <StatusChip status={order.status} />
+              </TableCell>
+
+              <TableCell className="text-sm">{order.eingang}</TableCell>
+              <TableCell className="text-sm">{order.fertigBis}</TableCell>
+
+              <TableCell>
+                <div className="flex items-center justify-end gap-2">
+                  <Button
+                    size="sm"
+                    onClick={() => router.push(`/dashboard/auftraege/${order.id}`)}
                   >
-                    <td className="p-4 font-mono font-medium">{order.leitzahl}</td>
-                    <td className="p-4">{order.fahrzeug}</td>
-                    <td className="p-4">{order.modell}</td>
-                    <td className="p-4 font-mono text-sm">{order.fin}</td>
+                    <Pencil className="w-4 h-4 mr-1" />
+                    Bearbeiten
+                  </Button>
 
-                    {/* ✅ Ampel Chip visible */}
-                    <td className="p-4">
-                      <StatusChip status={order.status} />
-                    </td>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    onClick={() =>
+                      router.push(`/dashboard/auftraege/${order.id}?preview=true`)
+                    }
+                  >
+                    <Eye className="w-4 h-4 mr-1" />
+                    Vorschau
+                  </Button>
 
-                    <td className="p-4 text-sm">{order.eingang}</td>
-                    <td className="p-4 text-sm">{order.fertigBis}</td>
+                  <Button
+                    size="sm"
+                    variant="outline"
+                    className="text-red-600 hover:text-red-700 hover:bg-red-500/10"
+                    onClick={() => handleDelete(order.id)}
+                  >
+                    <Trash2 className="w-4 h-4 mr-1" />
+                    Löschen
+                  </Button>
+                </div>
+              </TableCell>
+            </TableRow>
+          ))}
 
-                    <td className="p-4">
-                      <div className="flex items-center justify-end gap-2">
-                        <Button
-                          size="sm"
-                          onClick={() => router.push(`/dashboard/auftraege/${order.id}`)}
-                        >
-                          <Pencil className="w-4 h-4 mr-1" />
-                          Bearbeiten
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          onClick={() =>
-                            router.push(`/dashboard/auftraege/${order.id}?preview=true`)
-                          }
-                        >
-                          <Eye className="w-4 h-4 mr-1" />
-                          Vorschau
-                        </Button>
-
-                        <Button
-                          size="sm"
-                          variant="outline"
-                          className="text-red-600 hover:text-red-700 hover:bg-red-500/10"
-                          onClick={() => handleDelete(order.id)}
-                        >
-                          <Trash2 className="w-4 h-4 mr-1" />
-                          Löschen
-                        </Button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-
-                {filteredOrders.length === 0 && (
-                  <tr>
-                    <td colSpan={8} className="p-8 text-center text-muted-foreground">
-                      Keine Aufträge gefunden.
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </CardContent>
-      </Card>
+          {filteredOrders.length === 0 && (
+            <TableRow>
+              <TableCell colSpan={8} className="py-10 text-center text-muted-foreground">
+                Keine Aufträge gefunden.
+              </TableCell>
+            </TableRow>
+          )}
+        </TableBody>
+      </Table>
     </div>
   )
 }
