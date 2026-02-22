@@ -20,17 +20,18 @@ export function Sidebar() {
 
   return (
     <aside className="w-56 bg-card border-r border-border flex flex-col h-screen sticky top-0">
-      {/* Logo */}
-      <div className="p-4 border-b border-border">
-        <Link href="/dashboard" className="flex items-center gap-3">
+      
+      {/* Logo Bereich */}
+      <div className="py-6 border-b border-border flex justify-center">
+        <Link href="/dashboard">
           <Image
             src="/ruehl-logo.svg"
-            width={80}
-            height={80}
+            alt="Rühl Automotive"
+            width={90}
+            height={90}
             priority
             className="filter-none invert-0"
           />
-          <span className="font-semibold text-sm">Rühl Automotive</span>
         </Link>
       </div>
 
