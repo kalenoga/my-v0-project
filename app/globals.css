@@ -65,17 +65,18 @@
     --tint-info-fg: rgba(0, 84, 204, 1);
     --tint-info-ring: rgba(0, 122, 255, 0.22);
 
-    --tint-success: rgba(52, 199, 89, 0.14);
-    --tint-success-fg: rgba(24, 128, 56, 1);
-    --tint-success-ring: rgba(52, 199, 89, 0.22);
+    /* ✅ Ampel kräftiger (besser sichtbar) */
+    --tint-success: rgba(52, 199, 89, 0.18);
+    --tint-success-fg: rgba(16, 120, 52, 1);
+    --tint-success-ring: rgba(52, 199, 89, 0.30);
 
-    --tint-warning: rgba(255, 149, 0, 0.14);
-    --tint-warning-fg: rgba(178, 98, 0, 1);
-    --tint-warning-ring: rgba(255, 149, 0, 0.22);
+    --tint-warning: rgba(255, 149, 0, 0.18);
+    --tint-warning-fg: rgba(170, 92, 0, 1);
+    --tint-warning-ring: rgba(255, 149, 0, 0.30);
 
-    --tint-danger: rgba(255, 59, 48, 0.14);
-    --tint-danger-fg: rgba(180, 34, 28, 1);
-    --tint-danger-ring: rgba(255, 59, 48, 0.22);
+    --tint-danger: rgba(255, 59, 48, 0.18);
+    --tint-danger-fg: rgba(170, 30, 24, 1);
+    --tint-danger-ring: rgba(255, 59, 48, 0.30);
   }
 
   .dark {
@@ -104,17 +105,17 @@
     --tint-info-fg: rgba(180, 214, 255, 1);
     --tint-info-ring: rgba(10, 132, 255, 0.28);
 
-    --tint-success: rgba(48, 209, 88, 0.22);
+    --tint-success: rgba(48, 209, 88, 0.24);
     --tint-success-fg: rgba(186, 240, 200, 1);
-    --tint-success-ring: rgba(48, 209, 88, 0.28);
+    --tint-success-ring: rgba(48, 209, 88, 0.32);
 
-    --tint-warning: rgba(255, 159, 10, 0.22);
+    --tint-warning: rgba(255, 159, 10, 0.24);
     --tint-warning-fg: rgba(255, 224, 180, 1);
-    --tint-warning-ring: rgba(255, 159, 10, 0.28);
+    --tint-warning-ring: rgba(255, 159, 10, 0.32);
 
-    --tint-danger: rgba(255, 69, 58, 0.22);
+    --tint-danger: rgba(255, 69, 58, 0.24);
     --tint-danger-fg: rgba(255, 200, 195, 1);
-    --tint-danger-ring: rgba(255, 69, 58, 0.28);
+    --tint-danger-ring: rgba(255, 69, 58, 0.32);
   }
 
   body {
