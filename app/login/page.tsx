@@ -45,14 +45,23 @@ export default function LoginPage() {
               <div className="absolute inset-1 rounded-full bg-gradient-to-b from-gray-800 to-black" />
               <div className="absolute inset-2 rounded-full border-2 border-red-600" />
               <div className="absolute inset-0 flex items-center justify-center">
-                <Image src="/ruehl-logo.svg" alt="Rühl Automotive" width={70} height={70} className="invert" />
+                <Image
+                  src="/ruehl-logo.svg"
+                  alt="Rühl Automotive"
+                  width={70}
+                  height={70}
+                  priority
+                  className="invert-0 filter-none"
+                />
               </div>
             </div>
           </div>
 
           {/* Title */}
           <h1 className="text-2xl font-bold text-center mb-2">Willkommen</h1>
-          <p className="text-muted-foreground text-center mb-6">Bitte melde dich mit deinen Zugangsdaten an.</p>
+          <p className="text-muted-foreground text-center mb-6">
+            Bitte melde dich mit deinen Zugangsdaten an.
+          </p>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
