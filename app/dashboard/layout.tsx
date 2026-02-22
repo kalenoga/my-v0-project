@@ -1,21 +1,17 @@
 "use client"
 
 import type React from "react"
-
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 import { OrdersProvider } from "@/lib/orders-context"
-import { Sidebar } from "@/components/dashboard/sidebar"
+import { Sidebar, MobileSidebar } from "@/components/dashboard/sidebar"
 import { DashboardHeader } from "@/components/dashboard/header"
 
-export default function DashboardLayout({
-  children,
-}: {
-  children: React.ReactNode
-}) {
+export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
   const router = useRouter()
+  const [mobileNavOpen, setMobileNavOpen] = useState(false)
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -23,10 +19,20 @@ export default function DashboardLayout({
     }
   }, [user, isLoading, router])
 
+  // ✅ ESC closes drawer
+  useEffect(() => {
+    if (!mobileNavOpen) return
+    const onKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setMobileNavOpen(false)
+    }
+    window.addEventListener("keydown", onKeyDown)
+    return () => window.removeEventListener("keydown", onKeyDown)
+  }, [mobileNavOpen])
+
   if (isLoading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-background">
-        <div className="h-9 w-9 rounded-full border-2 border-border border-t-foreground/60 animate-spin" />
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary" />
       </div>
     )
   }
@@ -35,22 +41,18 @@ export default function DashboardLayout({
 
   return (
     <OrdersProvider>
-      <div className="min-h-screen bg-background">
-        <div className="flex min-h-screen bg-muted/20">
-          {/* Desktop Sidebar only (already hidden in component via hidden lg:flex) */}
-          <Sidebar />
+      <div className="flex min-h-screen bg-muted/30">
+        {/* Desktop Sidebar */}
+        <Sidebar />
 
-          {/* Main column */}
-          <div className="flex-1 flex flex-col min-w-0">
-            <DashboardHeader />
+        {/* Mobile Sidebar Drawer */}
+        <MobileSidebar open={mobileNavOpen} onOpenChange={setMobileNavOpen} />
 
-            {/* Content */}
-            <main className="flex-1">
-              <div className="mx-auto w-full max-w-[1440px] px-4 py-6 sm:px-6 lg:px-8">
-                {children}
-              </div>
-            </main>
-          </div>
+        <div className="flex-1 flex flex-col min-w-0">
+          <DashboardHeader onMenuClick={() => setMobileNavOpen(true)} />
+
+          {/* ✅ Mobile padding smaller */}
+          <main className="flex-1 p-4 sm:p-6 min-w-0">{children}</main>
         </div>
       </div>
     </OrdersProvider>
