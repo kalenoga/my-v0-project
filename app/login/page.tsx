@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import { useRouter } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
@@ -26,11 +25,13 @@ export default function LoginPage() {
     setIsLoading(true)
 
     const success = await login(email, password)
+
     if (success) {
       router.push("/dashboard")
     } else {
       setError("Ungültige Anmeldedaten oder Benutzer ist deaktiviert.")
     }
+
     setIsLoading(false)
   }
 
@@ -38,39 +39,42 @@ export default function LoginPage() {
     <div className="min-h-screen bg-muted/30 flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md">
         <div className="bg-card rounded-2xl shadow-lg p-8">
+          
           {/* Logo */}
           <div className="flex justify-center mb-6">
-            <div className="relative w-32 h-32">
-              <div className="absolute inset-0 rounded-full bg-gradient-to-b from-gray-700 via-gray-900 to-black shadow-xl" />
-              <div className="absolute inset-1 rounded-full bg-gradient-to-b from-gray-800 to-black" />
-              <div className="absolute inset-2 rounded-full border-2 border-red-600" />
-              <div className="absolute inset-0 flex items-center justify-center">
-                <Image
-                  src="/ruehl-logo.svg"
-                  alt="Rühl Automotive"
-                  width={70}
-                  height={70}
-                  priority
-                  className="invert-0 filter-none"
-                />
-              </div>
-            </div>
+            <Image
+              src="/ruehl-logo.svg"
+              alt="Rühl Automotive"
+              width={120}
+              height={120}
+              priority
+              style={{
+                filter: "none",
+                WebkitFilter: "none"
+              }}
+            />
           </div>
 
           {/* Title */}
-          <h1 className="text-2xl font-bold text-center mb-2">Willkommen</h1>
+          <h1 className="text-2xl font-bold text-center mb-2">
+            Willkommen
+          </h1>
+
           <p className="text-muted-foreground text-center mb-6">
             Bitte melde dich mit deinen Zugangsdaten an.
           </p>
 
           {/* Form */}
           <form onSubmit={handleSubmit} className="space-y-4">
+
             <div className="space-y-2">
               <Label htmlFor="email" className="text-xs font-semibold uppercase tracking-wide">
                 E-Mail
               </Label>
+
               <div className="relative">
                 <User className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+
                 <Input
                   id="email"
                   type="email"
@@ -87,8 +91,10 @@ export default function LoginPage() {
               <Label htmlFor="password" className="text-xs font-semibold uppercase tracking-wide">
                 Passwort
               </Label>
+
               <div className="relative">
                 <Lock className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-muted-foreground" />
+
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
@@ -98,20 +104,32 @@ export default function LoginPage() {
                   className="pl-10 pr-10 h-12 bg-muted/50 border-0"
                   required
                 />
+
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
                   className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
-                  {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  {showPassword ? (
+                    <EyeOff className="h-5 w-5" />
+                  ) : (
+                    <Eye className="h-5 w-5" />
+                  )}
                 </button>
               </div>
             </div>
 
-            {error && <p className="text-sm text-destructive text-center">{error}</p>}
+            {error && (
+              <p className="text-sm text-destructive text-center">
+                {error}
+              </p>
+            )}
 
             <div className="text-right">
-              <button type="button" className="text-sm text-primary hover:underline">
+              <button
+                type="button"
+                className="text-sm text-primary hover:underline"
+              >
                 Passwort vergessen?
               </button>
             </div>
