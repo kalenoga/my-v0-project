@@ -58,7 +58,6 @@ export function PKWProductionFormEmbedded({
     (field: string, value: string) => {
       if (readOnly) return
       setHeaderState((prev) => ({ ...prev, [field]: value }))
-
       const fieldMap: Record<string, string> = {
         datum: "eingang",
         status: "status",
@@ -70,7 +69,6 @@ export function PKWProductionFormEmbedded({
         fertigBis: "fertigBis",
         leitzahl: "leitzahl",
       }
-
       const orderField = fieldMap[field] || field
       onHeaderDataChange({ [orderField]: value } as Partial<Order>)
     },
@@ -83,9 +81,7 @@ export function PKWProductionFormEmbedded({
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const handlePrint = () => {
-    window.print()
-  }
+  const handlePrint = () => window.print()
 
   const handleReset = () => {
     if (confirm("Alle Formulardaten zuruecksetzen?")) {
@@ -96,118 +92,96 @@ export function PKWProductionFormEmbedded({
 
   const totalPages = 5
 
+  // Hilfsfunktion: Render einer Seite
+  const RenderPage = ({ page }: { page: number }) => {
+    if (page === 1) return <Page01 formData={formData as Record<string, string>} updateField={() => {}} />
+    if (page === 2) return <Page02 formData={formData} updateField={() => {}} />
+    if (page === 3) return <Page03 formData={formData} updateField={() => {}} />
+    if (page === 4) return <Page04 formData={formData} updateField={() => {}} />
+    return <Page05 formData={formData as Record<string, string>} updateField={() => {}} />
+  }
+
   return (
     <div className="bg-white rounded-lg shadow-sm border">
-      {/* Print CSS: erzwingt A4 und Seitenumbrüche */}
+      {/* PRINT CSS – echte A4 Seiten erzwingen */}
       <style jsx global>{`
         @media print {
           @page {
             size: A4;
-            margin: 12mm;
+            margin: 0;
           }
 
           html,
           body {
-            background: #ffffff !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
+            background: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
           }
 
-          /* Alles was nicht gedruckt werden soll */
+          /* Am Print alles, was UI ist, komplett weg */
           .no-print {
             display: none !important;
           }
 
-          /* Jede Seite als A4-Seite behandeln */
-          .print-page {
-            break-after: page;
-            page-break-after: always;
+          /* Ein A4-Blatt (Portrait) */
+          .a4-sheet {
+            width: 210mm !important;
+            height: 297mm !important;
+            margin: 0 !important;
+            padding: 12mm !important; /* hier stellst du den Weißrand ein */
+            box-sizing: border-box !important;
+
+            /* SUPER WICHTIG:
+               sonst erzeugt Überlauf Zusatzseiten -> bei dir die 12 Seiten */
+            overflow: hidden !important;
+
+            /* harte Umbrüche */
+            break-after: page !important;
+            page-break-after: always !important;
           }
 
-          .print-page:last-child {
-            break-after: auto;
-            page-break-after: auto;
+          .a4-sheet:last-child {
+            break-after: auto !important;
+            page-break-after: auto !important;
           }
 
-          /* Verhindert, dass einzelne Boxen zerrissen werden */
-          .avoid-break {
-            break-inside: avoid;
-            page-break-inside: avoid;
-          }
-
-          /* Schatten raus */
+          /* Keine Schatten */
           [class*="shadow"] {
             box-shadow: none !important;
           }
         }
       `}</style>
 
-      {/* Form Header (am Bildschirm sichtbar, im Druck wird es pro Seite separat gerendert) */}
+      {/* SCREEN: Header + einzelne Seite */}
       <div className="no-print">
         <FormHeader
           formData={headerState}
           updateField={readOnly ? () => {} : updateHeaderField}
           currentPage={currentPage}
         />
+
+        <div className={`p-6 ${readOnly ? "opacity-90 pointer-events-none select-none" : ""}`}>
+          {currentPage === 1 && <Page01 formData={formData as Record<string, string>} updateField={updateFormField} />}
+          {currentPage === 2 && <Page02 formData={formData} updateField={updateFormField} />}
+          {currentPage === 3 && <Page03 formData={formData} updateField={updateFormField} />}
+          {currentPage === 4 && <Page04 formData={formData} updateField={updateFormField} />}
+          {currentPage === 5 && <Page05 formData={formData as Record<string, string>} updateField={updateFormField} />}
+        </div>
       </div>
 
-      {/* =========================
-          SCREEN: nur aktuelle Seite
-         ========================= */}
-      <div className={`p-6 ${readOnly ? "opacity-90 pointer-events-none select-none" : ""} no-print`}>
-        {currentPage === 1 && <Page01 formData={formData as Record<string, string>} updateField={updateFormField} />}
-        {currentPage === 2 && <Page02 formData={formData} updateField={updateFormField} />}
-        {currentPage === 3 && <Page03 formData={formData} updateField={updateFormField} />}
-        {currentPage === 4 && <Page04 formData={formData} updateField={updateFormField} />}
-        {currentPage === 5 && <Page05 formData={formData as Record<string, string>} updateField={updateFormField} />}
-      </div>
-
-      {/* =========================
-          PRINT: alle 5 Seiten
-         ========================= */}
+      {/* PRINT: 5 feste A4-Seiten */}
       <div className="hidden print:block">
-        {/* Seite 1 */}
-        <div className="print-page">
-          <FormHeader formData={headerState} updateField={() => {}} currentPage={1} />
-          <div className="p-4">
-            <Page01 formData={formData as Record<string, string>} updateField={() => {}} />
+        {[1, 2, 3, 4, 5].map((p) => (
+          <div className="a4-sheet" key={p}>
+            <FormHeader formData={headerState} updateField={() => {}} currentPage={p} />
+            <div style={{ paddingTop: "6mm" }}>
+              <RenderPage page={p} />
+            </div>
           </div>
-        </div>
-
-        {/* Seite 2 */}
-        <div className="print-page">
-          <FormHeader formData={headerState} updateField={() => {}} currentPage={2} />
-          <div className="p-4">
-            <Page02 formData={formData} updateField={() => {}} />
-          </div>
-        </div>
-
-        {/* Seite 3 */}
-        <div className="print-page">
-          <FormHeader formData={headerState} updateField={() => {}} currentPage={3} />
-          <div className="p-4">
-            <Page03 formData={formData} updateField={() => {}} />
-          </div>
-        </div>
-
-        {/* Seite 4 */}
-        <div className="print-page">
-          <FormHeader formData={headerState} updateField={() => {}} currentPage={4} />
-          <div className="p-4">
-            <Page04 formData={formData} updateField={() => {}} />
-          </div>
-        </div>
-
-        {/* Seite 5 */}
-        <div className="print-page">
-          <FormHeader formData={headerState} updateField={() => {}} currentPage={5} />
-          <div className="p-4">
-            <Page05 formData={formData as Record<string, string>} updateField={() => {}} />
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Navigation & Actions (niemals drucken) */}
+      {/* Navigation & Aktionen – niemals drucken */}
       <div className="flex items-center justify-between p-4 border-t no-print">
         <div className="flex items-center gap-2">
           <Button
@@ -247,7 +221,7 @@ export function PKWProductionFormEmbedded({
           </Button>
         </div>
 
-        {!readOnly && (
+        {!readOnly ? (
           <div className="flex items-center gap-2">
             <Button onClick={handleReset} variant="outline" size="sm" className="bg-transparent">
               <RotateCcw className="w-4 h-4 mr-2" />
@@ -262,9 +236,7 @@ export function PKWProductionFormEmbedded({
               Drucken
             </Button>
           </div>
-        )}
-
-        {readOnly && (
+        ) : (
           <Button onClick={handlePrint} variant="outline" size="sm" className="bg-transparent">
             <Printer className="w-4 h-4 mr-2" />
             Drucken
