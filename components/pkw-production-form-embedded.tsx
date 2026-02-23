@@ -42,32 +42,40 @@ export function PKWProductionFormEmbedded({
     leitzahl: order.leitzahl,
   })
 
-  const updateFormField = useCallback((field: string, value: string | boolean) => {
-    if (readOnly) return
-    setFormData(prev => {
-      const updated = { ...prev, [field]: value }
-      onFormDataChange(updated)
-      return updated
-    })
-  }, [readOnly, onFormDataChange])
+  const updateFormField = useCallback(
+    (field: string, value: string | boolean) => {
+      if (readOnly) return
+      setFormData((prev) => {
+        const updated = { ...prev, [field]: value }
+        onFormDataChange(updated)
+        return updated
+      })
+    },
+    [readOnly, onFormDataChange]
+  )
 
-  const updateHeaderField = useCallback((field: string, value: string) => {
-    if (readOnly) return
-    setHeaderState(prev => ({ ...prev, [field]: value }))
-    const fieldMap: Record<string, string> = {
-      datum: "eingang",
-      status: "status",
-      fahrzeug: "fahrzeug",
-      modell: "modell",
-      fin: "fin",
-      auftragNr: "auftragNr",
-      eingang: "eingang",
-      fertigBis: "fertigBis",
-      leitzahl: "leitzahl",
-    }
-    const orderField = fieldMap[field] || field
-    onHeaderDataChange({ [orderField]: value } as Partial<Order>)
-  }, [readOnly, onHeaderDataChange])
+  const updateHeaderField = useCallback(
+    (field: string, value: string) => {
+      if (readOnly) return
+      setHeaderState((prev) => ({ ...prev, [field]: value }))
+
+      const fieldMap: Record<string, string> = {
+        datum: "eingang",
+        status: "status",
+        fahrzeug: "fahrzeug",
+        modell: "modell",
+        fin: "fin",
+        auftragNr: "auftragNr",
+        eingang: "eingang",
+        fertigBis: "fertigBis",
+        leitzahl: "leitzahl",
+      }
+
+      const orderField = fieldMap[field] || field
+      onHeaderDataChange({ [orderField]: value } as Partial<Order>)
+    },
+    [readOnly, onHeaderDataChange]
+  )
 
   const handleSave = () => {
     onFormDataChange(formData)
@@ -90,34 +98,117 @@ export function PKWProductionFormEmbedded({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border">
-      {/* Form Header */}
-      <FormHeader
-        formData={headerState}
-        updateField={readOnly ? () => {} : updateHeaderField}
-        currentPage={currentPage}
-      />
+      {/* Print CSS: erzwingt A4 und Seitenumbrüche */}
+      <style jsx global>{`
+        @media print {
+          @page {
+            size: A4;
+            margin: 12mm;
+          }
 
-      {/* Page Content */}
-      <div className={`p-6 print:p-4 ${readOnly ? "opacity-90 pointer-events-none select-none" : ""}`}>
-        {currentPage === 1 && (
-          <Page01 formData={formData as Record<string, string>} updateField={updateFormField} />
-        )}
-        {currentPage === 2 && (
-          <Page02 formData={formData} updateField={updateFormField} />
-        )}
-        {currentPage === 3 && (
-          <Page03 formData={formData} updateField={updateFormField} />
-        )}
-        {currentPage === 4 && (
-          <Page04 formData={formData} updateField={updateFormField} />
-        )}
-        {currentPage === 5 && (
-          <Page05 formData={formData as Record<string, string>} updateField={updateFormField} />
-        )}
+          html,
+          body {
+            background: #ffffff !important;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+          }
+
+          /* Alles was nicht gedruckt werden soll */
+          .no-print {
+            display: none !important;
+          }
+
+          /* Jede Seite als A4-Seite behandeln */
+          .print-page {
+            break-after: page;
+            page-break-after: always;
+          }
+
+          .print-page:last-child {
+            break-after: auto;
+            page-break-after: auto;
+          }
+
+          /* Verhindert, dass einzelne Boxen zerrissen werden */
+          .avoid-break {
+            break-inside: avoid;
+            page-break-inside: avoid;
+          }
+
+          /* Schatten raus */
+          [class*="shadow"] {
+            box-shadow: none !important;
+          }
+        }
+      `}</style>
+
+      {/* Form Header (am Bildschirm sichtbar, im Druck wird es pro Seite separat gerendert) */}
+      <div className="no-print">
+        <FormHeader
+          formData={headerState}
+          updateField={readOnly ? () => {} : updateHeaderField}
+          currentPage={currentPage}
+        />
       </div>
 
-      {/* Navigation & Actions */}
-      <div className="flex items-center justify-between p-4 border-t print:hidden">
+      {/* =========================
+          SCREEN: nur aktuelle Seite
+         ========================= */}
+      <div className={`p-6 ${readOnly ? "opacity-90 pointer-events-none select-none" : ""} no-print`}>
+        {currentPage === 1 && <Page01 formData={formData as Record<string, string>} updateField={updateFormField} />}
+        {currentPage === 2 && <Page02 formData={formData} updateField={updateFormField} />}
+        {currentPage === 3 && <Page03 formData={formData} updateField={updateFormField} />}
+        {currentPage === 4 && <Page04 formData={formData} updateField={updateFormField} />}
+        {currentPage === 5 && <Page05 formData={formData as Record<string, string>} updateField={updateFormField} />}
+      </div>
+
+      {/* =========================
+          PRINT: alle 5 Seiten
+         ========================= */}
+      <div className="hidden print:block">
+        {/* Seite 1 */}
+        <div className="print-page">
+          <FormHeader formData={headerState} updateField={() => {}} currentPage={1} />
+          <div className="p-4">
+            <Page01 formData={formData as Record<string, string>} updateField={() => {}} />
+          </div>
+        </div>
+
+        {/* Seite 2 */}
+        <div className="print-page">
+          <FormHeader formData={headerState} updateField={() => {}} currentPage={2} />
+          <div className="p-4">
+            <Page02 formData={formData} updateField={() => {}} />
+          </div>
+        </div>
+
+        {/* Seite 3 */}
+        <div className="print-page">
+          <FormHeader formData={headerState} updateField={() => {}} currentPage={3} />
+          <div className="p-4">
+            <Page03 formData={formData} updateField={() => {}} />
+          </div>
+        </div>
+
+        {/* Seite 4 */}
+        <div className="print-page">
+          <FormHeader formData={headerState} updateField={() => {}} currentPage={4} />
+          <div className="p-4">
+            <Page04 formData={formData} updateField={() => {}} />
+          </div>
+        </div>
+
+        {/* Seite 5 */}
+        <div className="print-page">
+          <FormHeader formData={headerState} updateField={() => {}} currentPage={5} />
+          <div className="p-4">
+            <Page05 formData={formData as Record<string, string>} updateField={() => {}} />
+          </div>
+        </div>
+      </div>
+
+      {/* Navigation & Actions (niemals drucken) */}
+      <div className="flex items-center justify-between p-4 border-t no-print">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -127,8 +218,9 @@ export function PKWProductionFormEmbedded({
             disabled={currentPage === 1}
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
-            {"Zurück"}
+            Zurück
           </Button>
+
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((page) => (
               <Button
@@ -142,6 +234,7 @@ export function PKWProductionFormEmbedded({
               </Button>
             ))}
           </div>
+
           <Button
             variant="outline"
             size="sm"
@@ -158,7 +251,7 @@ export function PKWProductionFormEmbedded({
           <div className="flex items-center gap-2">
             <Button onClick={handleReset} variant="outline" size="sm" className="bg-transparent">
               <RotateCcw className="w-4 h-4 mr-2" />
-              {"Zurücksetzen"}
+              Zurücksetzen
             </Button>
             <Button onClick={handleSave} variant="outline" size="sm" className="bg-transparent">
               <Save className="w-4 h-4 mr-2" />
