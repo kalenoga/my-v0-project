@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useEffect } from "react"
@@ -10,10 +9,51 @@ export default function AuftragPrintPage({ params }: { params: { id: string } })
   const order = getOrder(params.id)
 
   useEffect(() => {
-    // kleinen Delay, damit der Inhalt erst rendert bevor der Druckdialog kommt
     const t = setTimeout(() => {
-      window.print()
-    }, 300)
+      const el = document.getElementById("print-root")
+      if (!el) return
+
+      const w = window.open("", "_blank", "width=900,height=1200")
+      if (!w) return
+
+      w.document.open()
+      w.document.write(`
+        <!doctype html>
+        <html>
+          <head>
+            <meta charset="utf-8" />
+            <meta name="viewport" content="width=device-width, initial-scale=1" />
+            <title>Druck</title>
+            <style>
+              @page { size: A4; margin: 12mm; }
+              html, body { margin: 0; padding: 0; background: #fff; }
+              * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
+              /* A4 Breite */
+              .sheet { width: 210mm; margin: 0 auto; }
+
+              /* Verhindert hässliche Teilungen */
+              .avoid-break { break-inside: avoid; page-break-inside: avoid; }
+
+              /* Schatten entfernen */
+              [class*="shadow"] { box-shadow: none !important; }
+            </style>
+          </head>
+          <body>
+            <div class="sheet">
+              ${el.innerHTML}
+            </div>
+          </body>
+        </html>
+      `)
+      w.document.close()
+
+      w.focus()
+      w.print()
+
+      // optional schließen
+      setTimeout(() => w.close(), 400)
+    }, 700)
 
     return () => clearTimeout(t)
   }, [])
@@ -28,8 +68,8 @@ export default function AuftragPrintPage({ params }: { params: { id: string } })
 
   return (
     <div className="bg-white text-black">
-      {/* NUR der Inhalt wird gedruckt */}
-      <div className="print-area">
+      {/* Das ist nur die Quelle, die ins Druckfenster kopiert wird */}
+      <div id="print-root">
         <PKWProductionFormEmbedded
           order={order}
           onFormDataChange={() => {}}
@@ -38,52 +78,10 @@ export default function AuftragPrintPage({ params }: { params: { id: string } })
         />
       </div>
 
-      {/* Print-Styles direkt in die Seite eingebettet (damit du nichts anderes anfassen musst) */}
-      <style jsx global>{`
-        @media print {
-          @page {
-            size: A4;
-            margin: 12mm;
-          }
-
-          html,
-          body {
-            background: #ffffff !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
-            height: auto !important;
-          }
-
-          /* Alles ausblenden */
-          body * {
-            visibility: hidden;
-          }
-
-          /* Nur print-area anzeigen */
-          .print-area,
-          .print-area * {
-            visibility: visible;
-          }
-
-          .print-area {
-            position: absolute;
-            left: 0;
-            top: 0;
-            width: 210mm;
-          }
-
-          /* Keine Schatten im Druck */
-          .print-area [class*="shadow"] {
-            box-shadow: none !important;
-          }
-
-          /* Falls irgendwas sticky/fixed ist */
-          .print-area [class*="sticky"],
-          .print-area [class*="fixed"] {
-            position: static !important;
-          }
-        }
-      `}</style>
+      {/* Bildschirmhinweis */}
+      <div className="p-6 print:hidden">
+        <p className="text-sm text-muted-foreground">Druckansicht wird geöffnet…</p>
+      </div>
     </div>
   )
 }
