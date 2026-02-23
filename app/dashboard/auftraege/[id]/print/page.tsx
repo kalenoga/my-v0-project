@@ -9,79 +9,82 @@ export default function AuftragPrintPage({ params }: { params: { id: string } })
   const order = getOrder(params.id)
 
   useEffect(() => {
+    // Wichtig: erst rendern lassen, dann Print
     const t = setTimeout(() => {
-      const el = document.getElementById("print-root")
-      if (!el) return
-
-      const w = window.open("", "_blank", "width=900,height=1200")
-      if (!w) return
-
-      w.document.open()
-      w.document.write(`
-        <!doctype html>
-        <html>
-          <head>
-            <meta charset="utf-8" />
-            <meta name="viewport" content="width=device-width, initial-scale=1" />
-            <title>Druck</title>
-            <style>
-              @page { size: A4; margin: 12mm; }
-              html, body { margin: 0; padding: 0; background: #fff; }
-              * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-
-              /* A4 Breite */
-              .sheet { width: 210mm; margin: 0 auto; }
-
-              /* Verhindert hässliche Teilungen */
-              .avoid-break { break-inside: avoid; page-break-inside: avoid; }
-
-              /* Schatten entfernen */
-              [class*="shadow"] { box-shadow: none !important; }
-            </style>
-          </head>
-          <body>
-            <div class="sheet">
-              ${el.innerHTML}
-            </div>
-          </body>
-        </html>
-      `)
-      w.document.close()
-
-      w.focus()
-      w.print()
-
-      // optional schließen
-      setTimeout(() => w.close(), 400)
-    }, 700)
+      // Nur drucken, wenn wir wirklich auf /print sind
+      if (!window.location.pathname.endsWith("/print")) return
+      window.print()
+    }, 600)
 
     return () => clearTimeout(t)
   }, [])
 
   if (!order) {
     return (
-      <div className="p-6">
-        <p className="text-sm text-muted-foreground">Auftrag nicht gefunden.</p>
+      <div style={{ padding: 24 }}>
+        <p style={{ fontSize: 14, color: "#666" }}>Auftrag nicht gefunden.</p>
       </div>
     )
   }
 
   return (
-    <div className="bg-white text-black">
-      {/* Das ist nur die Quelle, die ins Druckfenster kopiert wird */}
-      <div id="print-root">
-        <PKWProductionFormEmbedded
-          order={order}
-          onFormDataChange={() => {}}
-          onHeaderDataChange={() => {}}
-          readOnly={true}
-        />
-      </div>
+    <div className="print-only-root">
+      {/* NUR das Formular */}
+      <PKWProductionFormEmbedded
+        order={order}
+        onFormDataChange={() => {}}
+        onHeaderDataChange={() => {}}
+        readOnly={true}
+      />
 
-      {/* Bildschirmhinweis */}
-      <div className="p-6 print:hidden">
-        <p className="text-sm text-muted-foreground">Druckansicht wird geöffnet…</p>
-      </div>
+      {/* Hard-Print CSS: Dashboard/Sidebar komplett killen */}
+      <style jsx global>{`
+        @media print {
+          @page {
+            size: A4;
+            margin: 10mm;
+          }
+
+          html,
+          body {
+            background: #fff !important;
+            -webkit-print-color-adjust: exact !important;
+            print-color-adjust: exact !important;
+          }
+
+          /* Alles ausblenden */
+          body * {
+            visibility: hidden !important;
+          }
+
+          /* Nur unser Print-Root sichtbar */
+          .print-only-root,
+          .print-only-root * {
+            visibility: visible !important;
+          }
+
+          .print-only-root {
+            position: absolute !important;
+            left: 0 !important;
+            top: 0 !important;
+            width: 210mm !important;
+          }
+
+          /* Alles, was irgendwie "Navigation" sein könnte, niemals drucken */
+          nav,
+          header,
+          footer,
+          button,
+          a {
+            display: none !important;
+          }
+
+          /* Schatten raus */
+          [class*="shadow"] {
+            box-shadow: none !important;
+          }
+        }
+      `}</style>
     </div>
   )
 }
