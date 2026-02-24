@@ -141,7 +141,7 @@ export function PKWProductionFormEmbedded({
           }
 
           .a4-scale {
-            transform: scale(0.88);
+            transform: scale(0.58);
             transform-origin: top left;
             width: calc(210mm - 12mm);
           }
