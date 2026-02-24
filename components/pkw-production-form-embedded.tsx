@@ -92,7 +92,6 @@ export function PKWProductionFormEmbedded({
 
   const totalPages = 5
 
-  // Hilfsfunktion: Render einer Seite
   const RenderPage = ({ page }: { page: number }) => {
     if (page === 1) return <Page01 formData={formData as Record<string, string>} updateField={() => {}} />
     if (page === 2) return <Page02 formData={formData} updateField={() => {}} />
@@ -103,7 +102,6 @@ export function PKWProductionFormEmbedded({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border">
-      {/* PRINT CSS – echte A4 Seiten erzwingen */}
       <style jsx global>{`
         @media print {
           @page {
@@ -118,24 +116,23 @@ export function PKWProductionFormEmbedded({
             print-color-adjust: exact !important;
           }
 
-          /* Am Print alles, was UI ist, komplett weg */
           .no-print {
             display: none !important;
           }
 
-          /* Ein A4-Blatt (Portrait) */
           .a4-sheet {
             width: 210mm !important;
             height: 297mm !important;
             margin: 0 !important;
-            padding: 12mm !important; /* hier stellst du den Weißrand ein */
+
+            /* Mehr Platz als vorher */
+            padding: 8mm !important;
+
             box-sizing: border-box !important;
 
-            /* SUPER WICHTIG:
-               sonst erzeugt Überlauf Zusatzseiten -> bei dir die 12 Seiten */
+            /* verhindert wieder "Zusatzseiten" */
             overflow: hidden !important;
 
-            /* harte Umbrüche */
             break-after: page !important;
             page-break-after: always !important;
           }
@@ -145,14 +142,20 @@ export function PKWProductionFormEmbedded({
             page-break-after: auto !important;
           }
 
-          /* Keine Schatten */
+          /* Inhalt leicht schrumpfen, damit alles sicher in A4 passt */
+          .a4-scale {
+            transform: scale(0.95);
+            transform-origin: top left;
+            width: calc(210mm - 16mm); /* 210mm minus links/rechts padding (2*8mm) */
+          }
+
           [class*="shadow"] {
             box-shadow: none !important;
           }
         }
       `}</style>
 
-      {/* SCREEN: Header + einzelne Seite */}
+      {/* SCREEN */}
       <div className="no-print">
         <FormHeader
           formData={headerState}
@@ -169,19 +172,21 @@ export function PKWProductionFormEmbedded({
         </div>
       </div>
 
-      {/* PRINT: 5 feste A4-Seiten */}
+      {/* PRINT */}
       <div className="hidden print:block">
         {[1, 2, 3, 4, 5].map((p) => (
           <div className="a4-sheet" key={p}>
-            <FormHeader formData={headerState} updateField={() => {}} currentPage={p} />
-            <div style={{ paddingTop: "6mm" }}>
-              <RenderPage page={p} />
+            <div className="a4-scale">
+              <FormHeader formData={headerState} updateField={() => {}} currentPage={p} />
+              <div style={{ paddingTop: "5mm" }}>
+                <RenderPage page={p} />
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* Navigation & Aktionen – niemals drucken */}
+      {/* ACTIONS */}
       <div className="flex items-center justify-between p-4 border-t no-print">
         <div className="flex items-center gap-2">
           <Button
