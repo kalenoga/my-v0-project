@@ -58,6 +58,7 @@ export function PKWProductionFormEmbedded({
     (field: string, value: string) => {
       if (readOnly) return
       setHeaderState((prev) => ({ ...prev, [field]: value }))
+
       const fieldMap: Record<string, string> = {
         datum: "eingang",
         status: "status",
@@ -69,6 +70,7 @@ export function PKWProductionFormEmbedded({
         fertigBis: "fertigBis",
         leitzahl: "leitzahl",
       }
+
       const orderField = fieldMap[field] || field
       onHeaderDataChange({ [orderField]: value } as Partial<Order>)
     },
@@ -102,6 +104,8 @@ export function PKWProductionFormEmbedded({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border">
+
+      {/* ================= PRINT STYLES ================= */}
       <style jsx global>{`
         @media print {
           @page {
@@ -124,15 +128,9 @@ export function PKWProductionFormEmbedded({
             width: 210mm !important;
             height: 297mm !important;
             margin: 0 !important;
-
-            /* Mehr Platz als vorher */
-            padding: 8mm !important;
-
+            padding: 6mm !important;
             box-sizing: border-box !important;
-
-            /* verhindert wieder "Zusatzseiten" */
             overflow: hidden !important;
-
             break-after: page !important;
             page-break-after: always !important;
           }
@@ -142,11 +140,10 @@ export function PKWProductionFormEmbedded({
             page-break-after: auto !important;
           }
 
-          /* Inhalt leicht schrumpfen, damit alles sicher in A4 passt */
           .a4-scale {
-            transform: scale(0.95);
+            transform: scale(0.92);
             transform-origin: top left;
-            width: calc(210mm - 16mm); /* 210mm minus links/rechts padding (2*8mm) */
+            width: calc(210mm - 12mm);
           }
 
           [class*="shadow"] {
@@ -155,7 +152,7 @@ export function PKWProductionFormEmbedded({
         }
       `}</style>
 
-      {/* SCREEN */}
+      {/* ================= SCREEN VERSION ================= */}
       <div className="no-print">
         <FormHeader
           formData={headerState}
@@ -172,7 +169,7 @@ export function PKWProductionFormEmbedded({
         </div>
       </div>
 
-      {/* PRINT */}
+      {/* ================= PRINT VERSION ================= */}
       <div className="hidden print:block">
         {[1, 2, 3, 4, 5].map((p) => (
           <div className="a4-sheet" key={p}>
@@ -186,7 +183,7 @@ export function PKWProductionFormEmbedded({
         ))}
       </div>
 
-      {/* ACTIONS */}
+      {/* ================= NAVIGATION ================= */}
       <div className="flex items-center justify-between p-4 border-t no-print">
         <div className="flex items-center gap-2">
           <Button
@@ -207,7 +204,9 @@ export function PKWProductionFormEmbedded({
                 onClick={() => setCurrentPage(page)}
                 variant={currentPage === page ? "default" : "outline"}
                 size="sm"
-                className={`w-8 h-8 p-0 ${currentPage === page ? "bg-[#1a2234] text-white" : "bg-transparent"}`}
+                className={`w-8 h-8 p-0 ${
+                  currentPage === page ? "bg-[#1a2234] text-white" : "bg-transparent"
+                }`}
               >
                 {page}
               </Button>
