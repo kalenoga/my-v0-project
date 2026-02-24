@@ -128,7 +128,7 @@ export function PKWProductionFormEmbedded({
             width: 210mm !important;
             height: 297mm !important;
             margin: 0 !important;
-            padding: 6mm !important;
+            padding: 2mm !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
             break-after: page !important;
@@ -141,7 +141,7 @@ export function PKWProductionFormEmbedded({
           }
 
           .a4-scale {
-            transform: scale(0.92);
+            transform: scale(0.88);
             transform-origin: top left;
             width: calc(210mm - 12mm);
           }
