@@ -104,7 +104,6 @@ export function PKWProductionFormEmbedded({
 
   return (
     <div className="bg-white rounded-lg shadow-sm border">
-
       {/* ================= PRINT STYLES ================= */}
       <style jsx global>{`
         @media print {
@@ -124,11 +123,12 @@ export function PKWProductionFormEmbedded({
             display: none !important;
           }
 
+          /* A4 Blatt */
           .a4-sheet {
             width: 210mm !important;
             height: 297mm !important;
             margin: 0 !important;
-            padding: 2mm !important;
+            padding: 0 !important;
             box-sizing: border-box !important;
             overflow: hidden !important;
             break-after: page !important;
@@ -140,10 +140,27 @@ export function PKWProductionFormEmbedded({
             page-break-after: auto !important;
           }
 
+          /* Inhalt innerhalb A4 – HIER regeln wir die echte nutzbare Fläche */
+          .a4-inner {
+            width: 210mm !important;
+            height: 297mm !important;
+            box-sizing: border-box !important;
+            padding: 4mm !important; /* <- kleiner Rand, mehr Platz */
+            overflow: hidden !important;
+          }
+
+          /* Stabiler als transform im Print: zoom */
           .a4-scale {
-            transform: scale(0.58);
-            transform-origin: top left;
-            width: calc(210mm - 12mm);
+            zoom: 0.90; /* <- wenn Seite 1 noch knapp ist: 0.88 */
+          }
+
+          /* Fallback für Browser ohne zoom */
+          @supports not (zoom: 1) {
+            .a4-scale {
+              transform: scale(0.90);
+              transform-origin: top left;
+              width: 210mm;
+            }
           }
 
           [class*="shadow"] {
@@ -173,10 +190,12 @@ export function PKWProductionFormEmbedded({
       <div className="hidden print:block">
         {[1, 2, 3, 4, 5].map((p) => (
           <div className="a4-sheet" key={p}>
-            <div className="a4-scale">
-              <FormHeader formData={headerState} updateField={() => {}} currentPage={p} />
-              <div style={{ paddingTop: "5mm" }}>
-                <RenderPage page={p} />
+            <div className="a4-inner">
+              <div className="a4-scale">
+                <FormHeader formData={headerState} updateField={() => {}} currentPage={p} />
+                <div style={{ paddingTop: "2mm" }}>
+                  <RenderPage page={p} />
+                </div>
               </div>
             </div>
           </div>
