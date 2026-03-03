@@ -2,7 +2,7 @@
 
 import type React from "react"
 import { useEffect, useState } from "react"
-import { useRouter } from "next/navigation"
+import { useRouter, usePathname } from "next/navigation"
 import { useAuth } from "@/lib/auth-context"
 import { OrdersProvider } from "@/lib/orders-context"
 import { Sidebar, MobileSidebar } from "@/components/dashboard/sidebar"
@@ -11,7 +11,11 @@ import { DashboardHeader } from "@/components/dashboard/header"
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const { user, isLoading } = useAuth()
   const router = useRouter()
+  const pathname = usePathname()
   const [mobileNavOpen, setMobileNavOpen] = useState(false)
+
+  // ✅ Print-Seiten erkennen (alles was /print enthält)
+  const isPrintRoute = pathname?.includes("/print")
 
   useEffect(() => {
     if (!isLoading && !user) {
@@ -39,19 +43,24 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
 
   if (!user) return null
 
+  // ✅ WICHTIG: Für /print KEINE Sidebar, KEIN Header, KEIN Padding
+  if (isPrintRoute) {
+    return (
+      <OrdersProvider>
+        <div style={{ margin: 0, padding: 0, background: "#fff" }}>{children}</div>
+      </OrdersProvider>
+    )
+  }
+
+  // ✅ Normaler Dashboard-Modus
   return (
     <OrdersProvider>
       <div className="flex min-h-screen bg-muted/30">
-        {/* Desktop Sidebar */}
         <Sidebar />
-
-        {/* Mobile Sidebar Drawer */}
         <MobileSidebar open={mobileNavOpen} onOpenChange={setMobileNavOpen} />
 
         <div className="flex-1 flex flex-col min-w-0">
           <DashboardHeader onMenuClick={() => setMobileNavOpen(true)} />
-
-          {/* ✅ Mobile padding smaller */}
           <main className="flex-1 p-4 sm:p-6 min-w-0">{children}</main>
         </div>
       </div>
