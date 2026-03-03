@@ -1,3 +1,4 @@
+// app/dashboard/auftraege/[id]/print/page.tsx
 "use client"
 
 import { useEffect } from "react"
@@ -9,9 +10,9 @@ export default function AuftragPrintPage({ params }: { params: { id: string } })
   const order = getOrder(params.id)
 
   useEffect(() => {
-    // Wichtig: erst rendern lassen, dann Print
+    // Erst rendern lassen, dann drucken
     const t = setTimeout(() => {
-      // Nur drucken, wenn wir wirklich auf /print sind
+      // Sicherheitscheck: Nur drucken, wenn wir wirklich auf /print sind
       if (!window.location.pathname.endsWith("/print")) return
       window.print()
     }, 600)
@@ -28,63 +29,74 @@ export default function AuftragPrintPage({ params }: { params: { id: string } })
   }
 
   return (
-    <div className="print-only-root">
-      {/* NUR das Formular */}
-      <PKWProductionFormEmbedded
-        order={order}
-        onFormDataChange={() => {}}
-        onHeaderDataChange={() => {}}
-        readOnly={true}
-      />
+    <>
+      {/* NUR Print-Inhalt */}
+      <div className="print-root">
+        <PKWProductionFormEmbedded
+          order={order}
+          onFormDataChange={() => {}}
+          onHeaderDataChange={() => {}}
+          readOnly={true}
+        />
+      </div>
 
-      {/* Hard-Print CSS: Dashboard/Sidebar komplett killen */}
+      {/* Print-CSS: A4 fix, nichts abgeschnitten, keine Dashboard-UI */}
       <style jsx global>{`
         @media print {
           @page {
             size: A4;
-            margin: 10mm;
+            margin: 0;
           }
 
           html,
           body {
+            margin: 0 !important;
+            padding: 0 !important;
             background: #fff !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
           }
 
-          /* Alles ausblenden */
+          /* Alles verstecken */
           body * {
             visibility: hidden !important;
           }
 
-          /* Nur unser Print-Root sichtbar */
-          .print-only-root,
-          .print-only-root * {
+          /* Nur print-root anzeigen */
+          .print-root,
+          .print-root * {
             visibility: visible !important;
           }
 
-          .print-only-root {
+          /* Druck oben links fixieren + A4 Breite */
+          .print-root {
             position: absolute !important;
             left: 0 !important;
             top: 0 !important;
             width: 210mm !important;
           }
 
-          /* Alles, was irgendwie "Navigation" sein könnte, niemals drucken */
-          nav,
-          header,
-          footer,
-          button,
-          a {
-            display: none !important;
+          /* Verhindert: Boxen werden in der Mitte geteilt */
+          .avoid-break {
+            break-inside: avoid;
+            page-break-inside: avoid;
           }
 
-          /* Schatten raus */
-          [class*="shadow"] {
-            box-shadow: none !important;
+          /* Verhindert: FIN / IDs werden senkrecht umgebrochen */
+          .no-wrap {
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            overflow-wrap: normal !important;
+          }
+
+          /* Generell: normaler Umbruch (kein break-all) */
+          .print-root,
+          .print-root * {
+            word-break: normal !important;
+            overflow-wrap: normal !important;
           }
         }
       `}</style>
-    </div>
+    </>
   )
 }
