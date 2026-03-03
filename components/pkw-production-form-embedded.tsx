@@ -27,7 +27,6 @@ export function PKWProductionFormEmbedded({
 }: PKWProductionFormEmbeddedProps) {
   const router = useRouter()
   const pathname = usePathname()
-
   const isPrintRoute = pathname?.includes("/print")
 
   const [currentPage, setCurrentPage] = useState(1)
@@ -89,14 +88,12 @@ export function PKWProductionFormEmbedded({
     setTimeout(() => setSaved(false), 2000)
   }
 
-  // ✅ WICHTIG: Nicht die Edit-Seite drucken, sondern Print-Route öffnen
+  // ✅ Wichtig: nicht Edit-Seite drucken, sondern Print-Route öffnen
   const handlePrint = () => {
     if (isPrintRoute) {
       window.print()
       return
     }
-
-    // Wenn wir z.B. auf /dashboard/auftraege/1 sind -> /dashboard/auftraege/1/print
     const target = pathname?.endsWith("/print") ? pathname : `${pathname}/print`
     router.push(target)
   }
@@ -119,7 +116,7 @@ export function PKWProductionFormEmbedded({
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-sm border">
+    <div className="pkw-form-root bg-white rounded-lg shadow-sm border">
       {/* ================= PRINT STYLES ================= */}
       <style jsx global>{`
         @media print {
@@ -137,6 +134,16 @@ export function PKWProductionFormEmbedded({
             print-color-adjust: exact !important;
           }
 
+          /* Wrapper darf im Print NICHT extra Platz fressen */
+          .pkw-form-root {
+            border: 0 !important;
+            border-radius: 0 !important;
+            box-shadow: none !important;
+            margin: 0 !important;
+            padding: 0 !important;
+            width: 210mm !important;
+          }
+
           .no-print {
             display: none !important;
           }
@@ -148,7 +155,6 @@ export function PKWProductionFormEmbedded({
             margin: 0 !important;
             padding: 0 !important;
             box-sizing: border-box !important;
-            overflow: hidden !important;
             break-after: page !important;
             page-break-after: always !important;
           }
@@ -163,14 +169,26 @@ export function PKWProductionFormEmbedded({
             width: 210mm !important;
             height: 297mm !important;
             box-sizing: border-box !important;
-            padding: 4mm !important;
-            overflow: hidden !important;
+            padding: 2mm !important; /* war 4mm -> mehr Platz nach unten */
           }
 
-          /* WICHTIG: Kein zoom/transform mehr im Print (macht “krumm & schief”) */
+          /*
+            ✅ DAS IST DER FIX GEGEN ABSCHNEIDEN:
+            Der Inhalt ist minimal zu hoch, deshalb leicht skalieren.
+            Wenn unten noch fehlt: 0.92
+            Wenn viel Luft ist: 0.95
+          */
           .a4-scale {
-            zoom: 1 !important;
-            transform: none !important;
+            zoom: 0.93 !important;
+          }
+
+          /* Fallback für Browser ohne zoom */
+          @supports not (zoom: 1) {
+            .a4-scale {
+              transform: scale(0.93) !important;
+              transform-origin: top left !important;
+              width: 210mm !important;
+            }
           }
 
           [class*="shadow"] {
@@ -210,7 +228,7 @@ export function PKWProductionFormEmbedded({
             <div className="a4-inner">
               <div className="a4-scale">
                 <FormHeader formData={headerState} updateField={() => {}} currentPage={p} />
-                <div style={{ paddingTop: "2mm" }}>
+                <div style={{ paddingTop: "1mm" }}>
                   <RenderPage page={p} />
                 </div>
               </div>
