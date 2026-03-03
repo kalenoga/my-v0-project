@@ -176,7 +176,7 @@ export function PKWProductionFormEmbedded({
             ✅ DAS IST DER FIX GEGEN ABSCHNEIDEN:
             Der Inhalt ist minimal zu hoch, deshalb leicht skalieren.
             Wenn unten noch fehlt: 0.92
-            Wenn viel Luft ist: 0.95
+            Wenn viel Luft ist: 0.85
           */
           .a4-scale {
             zoom: 0.93 !important;
