@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useCallback } from "react"
+import { usePathname, useRouter } from "next/navigation"
 import { Button } from "@/components/ui/button"
 import { FormHeader } from "@/components/form/form-header"
 import { Page01 } from "@/components/pages/page-01"
@@ -24,6 +25,11 @@ export function PKWProductionFormEmbedded({
   onHeaderDataChange,
   readOnly = false,
 }: PKWProductionFormEmbeddedProps) {
+  const router = useRouter()
+  const pathname = usePathname()
+
+  const isPrintRoute = pathname?.includes("/print")
+
   const [currentPage, setCurrentPage] = useState(1)
   const [formData, setFormData] = useState<Record<string, string | boolean>>(() => {
     return (order.formData as Record<string, string | boolean>) || {}
@@ -83,7 +89,17 @@ export function PKWProductionFormEmbedded({
     setTimeout(() => setSaved(false), 2000)
   }
 
-  const handlePrint = () => window.print()
+  // ✅ WICHTIG: Nicht die Edit-Seite drucken, sondern Print-Route öffnen
+  const handlePrint = () => {
+    if (isPrintRoute) {
+      window.print()
+      return
+    }
+
+    // Wenn wir z.B. auf /dashboard/auftraege/1 sind -> /dashboard/auftraege/1/print
+    const target = pathname?.endsWith("/print") ? pathname : `${pathname}/print`
+    router.push(target)
+  }
 
   const handleReset = () => {
     if (confirm("Alle Formulardaten zuruecksetzen?")) {
@@ -114,6 +130,8 @@ export function PKWProductionFormEmbedded({
 
           html,
           body {
+            margin: 0 !important;
+            padding: 0 !important;
             background: #fff !important;
             -webkit-print-color-adjust: exact !important;
             print-color-adjust: exact !important;
@@ -140,31 +158,30 @@ export function PKWProductionFormEmbedded({
             page-break-after: auto !important;
           }
 
-          /* Inhalt innerhalb A4 – HIER regeln wir die echte nutzbare Fläche */
+          /* Innenfläche */
           .a4-inner {
             width: 210mm !important;
             height: 297mm !important;
             box-sizing: border-box !important;
-            padding: 4mm !important; /* <- kleiner Rand, mehr Platz */
+            padding: 4mm !important;
             overflow: hidden !important;
           }
 
-          /* Stabiler als transform im Print: zoom */
+          /* WICHTIG: Kein zoom/transform mehr im Print (macht “krumm & schief”) */
           .a4-scale {
-            zoom: 0.90; /* <- wenn Seite 1 noch knapp ist: 0.88 */
-          }
-
-          /* Fallback für Browser ohne zoom */
-          @supports not (zoom: 1) {
-            .a4-scale {
-              transform: scale(0.90);
-              transform-origin: top left;
-              width: 210mm;
-            }
+            zoom: 1 !important;
+            transform: none !important;
           }
 
           [class*="shadow"] {
             box-shadow: none !important;
+          }
+
+          /* verhindert “FIN senkrecht” */
+          .no-wrap {
+            white-space: nowrap !important;
+            word-break: keep-all !important;
+            overflow-wrap: normal !important;
           }
         }
       `}</style>
@@ -223,9 +240,7 @@ export function PKWProductionFormEmbedded({
                 onClick={() => setCurrentPage(page)}
                 variant={currentPage === page ? "default" : "outline"}
                 size="sm"
-                className={`w-8 h-8 p-0 ${
-                  currentPage === page ? "bg-[#1a2234] text-white" : "bg-transparent"
-                }`}
+                className={`w-8 h-8 p-0 ${currentPage === page ? "bg-[#1a2234] text-white" : "bg-transparent"}`}
               >
                 {page}
               </Button>
