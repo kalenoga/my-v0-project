@@ -1,7 +1,6 @@
 "use client"
 
-import { useState, useCallback } from "react"
-import { usePathname, useRouter } from "next/navigation"
+import { useState, useCallback, useRef } from "react"
 import { Button } from "@/components/ui/button"
 import { FormHeader } from "@/components/form/form-header"
 import { Page01 } from "@/components/pages/page-01"
@@ -11,6 +10,55 @@ import { Page04 } from "@/components/pages/page-04"
 import { Page05 } from "@/components/pages/page-05"
 import { ChevronLeft, ChevronRight, Save, Printer, RotateCcw } from "lucide-react"
 import type { Order } from "@/lib/orders-context"
+
+// Print-optimized page wrapper component
+function PrintPage({ 
+  children, 
+  pageNumber, 
+  headerState, 
+  isLast = false 
+}: { 
+  children: React.ReactNode
+  pageNumber: number
+  headerState: Record<string, string>
+  isLast?: boolean
+}) {
+  return (
+    <div 
+      className="print-page"
+      style={{
+        width: '100%',
+        height: '297mm',
+        minHeight: '297mm',
+        maxHeight: '297mm',
+        padding: '8mm',
+        boxSizing: 'border-box',
+        overflow: 'hidden',
+        pageBreakAfter: isLast ? 'auto' : 'always',
+        pageBreakInside: 'avoid',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'white',
+        margin: 0,
+        border: 'none',
+      }}
+    >
+      <FormHeader 
+        formData={headerState as any} 
+        updateField={() => {}} 
+        currentPage={pageNumber} 
+      />
+      <div style={{ 
+        flex: 1, 
+        overflow: 'auto',
+        fontSize: '10pt',
+        lineHeight: '1.2'
+      }}>
+        {children}
+      </div>
+    </div>
+  )
+}
 
 interface PKWProductionFormEmbeddedProps {
   order: Order
@@ -25,10 +73,6 @@ export function PKWProductionFormEmbedded({
   onHeaderDataChange,
   readOnly = false,
 }: PKWProductionFormEmbeddedProps) {
-  const router = useRouter()
-  const pathname = usePathname()
-  const isPrintRoute = pathname?.includes("/print")
-
   const [currentPage, setCurrentPage] = useState(1)
   const [formData, setFormData] = useState<Record<string, string | boolean>>(() => {
     return (order.formData as Record<string, string | boolean>) || {}
@@ -47,40 +91,32 @@ export function PKWProductionFormEmbedded({
     leitzahl: order.leitzahl,
   })
 
-  const updateFormField = useCallback(
-    (field: string, value: string | boolean) => {
-      if (readOnly) return
-      setFormData((prev) => {
-        const updated = { ...prev, [field]: value }
-        onFormDataChange(updated)
-        return updated
-      })
-    },
-    [readOnly, onFormDataChange]
-  )
+  const updateFormField = useCallback((field: string, value: string | boolean) => {
+    if (readOnly) return
+    setFormData(prev => {
+      const updated = { ...prev, [field]: value }
+      onFormDataChange(updated)
+      return updated
+    })
+  }, [readOnly, onFormDataChange])
 
-  const updateHeaderField = useCallback(
-    (field: string, value: string) => {
-      if (readOnly) return
-      setHeaderState((prev) => ({ ...prev, [field]: value }))
-
-      const fieldMap: Record<string, string> = {
-        datum: "eingang",
-        status: "status",
-        fahrzeug: "fahrzeug",
-        modell: "modell",
-        fin: "fin",
-        auftragNr: "auftragNr",
-        eingang: "eingang",
-        fertigBis: "fertigBis",
-        leitzahl: "leitzahl",
-      }
-
-      const orderField = fieldMap[field] || field
-      onHeaderDataChange({ [orderField]: value } as Partial<Order>)
-    },
-    [readOnly, onHeaderDataChange]
-  )
+  const updateHeaderField = useCallback((field: string, value: string) => {
+    if (readOnly) return
+    setHeaderState(prev => ({ ...prev, [field]: value }))
+    const fieldMap: Record<string, string> = {
+      datum: "eingang",
+      status: "status",
+      fahrzeug: "fahrzeug",
+      modell: "modell",
+      fin: "fin",
+      auftragNr: "auftragNr",
+      eingang: "eingang",
+      fertigBis: "fertigBis",
+      leitzahl: "leitzahl",
+    }
+    const orderField = fieldMap[field] || field
+    onHeaderDataChange({ [orderField]: value } as Partial<Order>)
+  }, [readOnly, onHeaderDataChange])
 
   const handleSave = () => {
     onFormDataChange(formData)
@@ -88,14 +124,15 @@ export function PKWProductionFormEmbedded({
     setTimeout(() => setSaved(false), 2000)
   }
 
-  // ✅ Wichtig: nicht Edit-Seite drucken, sondern Print-Route öffnen
+  const [showPrintView, setShowPrintView] = useState(false)
+  const printContainerRef = useRef<HTMLDivElement>(null)
+
   const handlePrint = () => {
-    if (isPrintRoute) {
+    setShowPrintView(true)
+    setTimeout(() => {
       window.print()
-      return
-    }
-    const target = pathname?.endsWith("/print") ? pathname : `${pathname}/print`
-    router.push(target)
+      setTimeout(() => setShowPrintView(false), 500)
+    }, 100)
   }
 
   const handleReset = () => {
@@ -107,138 +144,59 @@ export function PKWProductionFormEmbedded({
 
   const totalPages = 5
 
-  const RenderPage = ({ page }: { page: number }) => {
-    if (page === 1) return <Page01 formData={formData as Record<string, string>} updateField={() => {}} />
-    if (page === 2) return <Page02 formData={formData} updateField={() => {}} />
-    if (page === 3) return <Page03 formData={formData} updateField={() => {}} />
-    if (page === 4) return <Page04 formData={formData} updateField={() => {}} />
-    return <Page05 formData={formData as Record<string, string>} updateField={() => {}} />
+  // Print view renders all 5 pages
+  if (showPrintView) {
+    return (
+      <div ref={printContainerRef} className="print-container">
+        <PrintPage pageNumber={1} headerState={headerState}>
+          <Page01 formData={formData as Record<string, string>} updateField={() => {}} />
+        </PrintPage>
+        <PrintPage pageNumber={2} headerState={headerState}>
+          <Page02 formData={formData} updateField={() => {}} />
+        </PrintPage>
+        <PrintPage pageNumber={3} headerState={headerState}>
+          <Page03 formData={formData} updateField={() => {}} />
+        </PrintPage>
+        <PrintPage pageNumber={4} headerState={headerState}>
+          <Page04 formData={formData} updateField={() => {}} />
+        </PrintPage>
+        <PrintPage pageNumber={5} headerState={headerState} isLast>
+          <Page05 formData={formData as Record<string, string>} updateField={() => {}} />
+        </PrintPage>
+      </div>
+    )
   }
 
   return (
-    <div className="pkw-form-root bg-white rounded-lg shadow-sm border">
-      {/* ================= PRINT STYLES ================= */}
-      <style jsx global>{`
-        @media print {
-          @page {
-            size: A4;
-            margin: 0;
-          }
+    <div className="bg-white rounded-lg shadow-sm border print:hidden">
+      {/* Form Header */}
+      <FormHeader
+        formData={headerState}
+        updateField={readOnly ? () => {} : updateHeaderField}
+        currentPage={currentPage}
+      />
 
-          html,
-          body {
-            margin: 0 !important;
-            padding: 0 !important;
-            background: #fff !important;
-            -webkit-print-color-adjust: exact !important;
-            print-color-adjust: exact !important;
-          }
-
-          /* Wrapper darf im Print NICHT extra Platz fressen */
-          .pkw-form-root {
-            border: 0 !important;
-            border-radius: 0 !important;
-            box-shadow: none !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            width: 210mm !important;
-          }
-
-          .no-print {
-            display: none !important;
-          }
-
-          /* A4 Blatt */
-          .a4-sheet {
-            width: 210mm !important;
-            height: 297mm !important;
-            margin: 0 !important;
-            padding: 0 !important;
-            box-sizing: border-box !important;
-            break-after: page !important;
-            page-break-after: always !important;
-          }
-
-          .a4-sheet:last-child {
-            break-after: auto !important;
-            page-break-after: auto !important;
-          }
-
-          /* Innenfläche */
-          .a4-inner {
-            width: 210mm !important;
-            height: 297mm !important;
-            box-sizing: border-box !important;
-            padding: 2mm !important; /* war 4mm -> mehr Platz nach unten */
-          }
-
-          /*
-            ✅ DAS IST DER FIX GEGEN ABSCHNEIDEN:
-            Der Inhalt ist minimal zu hoch, deshalb leicht skalieren.
-            Wenn unten noch fehlt: 0.92
-            Wenn viel Luft ist: 0.85
-          */
-          .a4-scale {
-            zoom: 0.93 !important;
-          }
-
-          /* Fallback für Browser ohne zoom */
-          @supports not (zoom: 1) {
-            .a4-scale {
-              transform: scale(0.93) !important;
-              transform-origin: top left !important;
-              width: 210mm !important;
-            }
-          }
-
-          [class*="shadow"] {
-            box-shadow: none !important;
-          }
-
-          /* verhindert “FIN senkrecht” */
-          .no-wrap {
-            white-space: nowrap !important;
-            word-break: keep-all !important;
-            overflow-wrap: normal !important;
-          }
-        }
-      `}</style>
-
-      {/* ================= SCREEN VERSION ================= */}
-      <div className="no-print">
-        <FormHeader
-          formData={headerState}
-          updateField={readOnly ? () => {} : updateHeaderField}
-          currentPage={currentPage}
-        />
-
-        <div className={`p-6 ${readOnly ? "opacity-90 pointer-events-none select-none" : ""}`}>
-          {currentPage === 1 && <Page01 formData={formData as Record<string, string>} updateField={updateFormField} />}
-          {currentPage === 2 && <Page02 formData={formData} updateField={updateFormField} />}
-          {currentPage === 3 && <Page03 formData={formData} updateField={updateFormField} />}
-          {currentPage === 4 && <Page04 formData={formData} updateField={updateFormField} />}
-          {currentPage === 5 && <Page05 formData={formData as Record<string, string>} updateField={updateFormField} />}
-        </div>
+      {/* Page Content */}
+      <div className={`p-6 print:p-4 ${readOnly ? "opacity-90 pointer-events-none select-none" : ""}`}>
+        {currentPage === 1 && (
+          <Page01 formData={formData as Record<string, string>} updateField={updateFormField} />
+        )}
+        {currentPage === 2 && (
+          <Page02 formData={formData} updateField={updateFormField} />
+        )}
+        {currentPage === 3 && (
+          <Page03 formData={formData} updateField={updateFormField} />
+        )}
+        {currentPage === 4 && (
+          <Page04 formData={formData} updateField={updateFormField} />
+        )}
+        {currentPage === 5 && (
+          <Page05 formData={formData as Record<string, string>} updateField={updateFormField} />
+        )}
       </div>
 
-      {/* ================= PRINT VERSION ================= */}
-      <div className="hidden print:block">
-        {[1, 2, 3, 4, 5].map((p) => (
-          <div className="a4-sheet" key={p}>
-            <div className="a4-inner">
-              <div className="a4-scale">
-                <FormHeader formData={headerState} updateField={() => {}} currentPage={p} />
-                <div style={{ paddingTop: "1mm" }}>
-                  <RenderPage page={p} />
-                </div>
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-
-      {/* ================= NAVIGATION ================= */}
-      <div className="flex items-center justify-between p-4 border-t no-print">
+      {/* Navigation & Actions */}
+      <div className="flex items-center justify-between p-4 border-t print:hidden">
         <div className="flex items-center gap-2">
           <Button
             variant="outline"
@@ -248,9 +206,8 @@ export function PKWProductionFormEmbedded({
             disabled={currentPage === 1}
           >
             <ChevronLeft className="w-4 h-4 mr-1" />
-            Zurück
+            {"Zurück"}
           </Button>
-
           <div className="flex gap-1">
             {[1, 2, 3, 4, 5].map((page) => (
               <Button
@@ -264,7 +221,6 @@ export function PKWProductionFormEmbedded({
               </Button>
             ))}
           </div>
-
           <Button
             variant="outline"
             size="sm"
@@ -277,11 +233,11 @@ export function PKWProductionFormEmbedded({
           </Button>
         </div>
 
-        {!readOnly ? (
+        {!readOnly && (
           <div className="flex items-center gap-2">
             <Button onClick={handleReset} variant="outline" size="sm" className="bg-transparent">
               <RotateCcw className="w-4 h-4 mr-2" />
-              Zurücksetzen
+              {"Zurücksetzen"}
             </Button>
             <Button onClick={handleSave} variant="outline" size="sm" className="bg-transparent">
               <Save className="w-4 h-4 mr-2" />
@@ -292,7 +248,9 @@ export function PKWProductionFormEmbedded({
               Drucken
             </Button>
           </div>
-        ) : (
+        )}
+
+        {readOnly && (
           <Button onClick={handlePrint} variant="outline" size="sm" className="bg-transparent">
             <Printer className="w-4 h-4 mr-2" />
             Drucken
