@@ -20,29 +20,29 @@ interface FormHeaderProps {
 
 export function FormHeader({ formData, updateField, currentPage }: FormHeaderProps) {
   return (
-    <div className="flex flex-col md:flex-row gap-6 mb-8">
+    <div className="flex flex-col md:flex-row gap-6 print:gap-2 mb-8 print:mb-2">
       {/* Logo and Title */}
-      <div className="flex items-start gap-4 flex-1">
+      <div className="flex items-start gap-4 print:gap-2 flex-1">
         {/* Rühl Logo */}
-        <div className="w-20 h-20 flex-shrink-0">
+        <div className="w-20 h-20 print:w-12 print:h-12 flex-shrink-0">
           <Image src="/ruehl-logo.svg" alt="Rühl Logo" width={80} height={80} className="w-full h-full" />
         </div>
 
         <div className="flex-1">
-          <h1 className="text-2xl md:text-3xl font-black tracking-tight leading-tight">
+          <h1 className="text-2xl print:text-sm md:text-3xl font-black tracking-tight leading-tight">
             PKW | PRODUKTIONS-
             <br />
             AUFTRAG
           </h1>
 
           {/* Leitzahl - Important field */}
-          <div className="mt-4 inline-flex items-center border-2 border-foreground rounded-full px-6 py-2">
-            <span className="font-bold mr-2">Leitzahl:</span>
+          <div className="mt-4 print:mt-1 inline-flex items-center border-2 print:border print-border-foreground rounded-full px-6 print:px-3 py-2 print:py-0.5">
+            <span className="font-bold print:text-8px mr-2 print:mr-1">Leitzahl:</span>
             <input
               type="text"
               value={formData.leitzahl}
               onChange={(e) => updateField("leitzahl", e.target.value)}
-              className="w-20 bg-transparent font-bold outline-none text-center text-lg"
+              className="w-20 bg-transparent font-bold outline-none text-center text-lg print:text-8px"
               placeholder="000"
             />
           </div>
@@ -50,7 +50,7 @@ export function FormHeader({ formData, updateField, currentPage }: FormHeaderPro
       </div>
 
       {/* Right side metadata */}
-      <div className="text-sm space-y-0.5 min-w-[200px]">
+      <div className="text-sm print:text-7px space-y-0.5 print:space-y-0 min-w-[200px]">
         <MetaField label="DATUM:" value={formData.datum} onChange={(v) => updateField("datum", v)} editable />
         <MetaField label="STATUS:" value={formData.status} onChange={(v) => updateField("status", v)} />
         <MetaField label="FAHRZEUG:" value={formData.fahrzeug} onChange={(v) => updateField("fahrzeug", v)} />
