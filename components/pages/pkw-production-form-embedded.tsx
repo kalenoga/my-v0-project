@@ -1,4 +1,3 @@
-
 "use client"
 
 import { useState, useCallback, useRef } from "react"
@@ -26,16 +25,22 @@ function PrintPage({
 }) {
   return (
     <div 
-      className={`print-page bg-white ${!isLast ? 'page-break-after' : ''}`}
+      className="print-page"
       style={{
-        width: '190mm',
-        minHeight: '277mm',
-        maxHeight: '277mm',
-        padding: '5mm',
+        width: '100%',
+        height: '297mm',
+        minHeight: '297mm',
+        maxHeight: '297mm',
+        padding: '8mm',
         boxSizing: 'border-box',
         overflow: 'hidden',
         pageBreakAfter: isLast ? 'auto' : 'always',
         pageBreakInside: 'avoid',
+        display: 'flex',
+        flexDirection: 'column',
+        background: 'white',
+        margin: 0,
+        border: 'none',
       }}
     >
       <FormHeader 
@@ -43,7 +48,12 @@ function PrintPage({
         updateField={() => {}} 
         currentPage={pageNumber} 
       />
-      <div style={{ transform: 'scale(0.85)', transformOrigin: 'top left', width: '117.6%' }}>
+      <div style={{ 
+        flex: 1, 
+        overflow: 'auto',
+        fontSize: '10pt',
+        lineHeight: '1.2'
+      }}>
         {children}
       </div>
     </div>
